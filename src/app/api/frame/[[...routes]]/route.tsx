@@ -3,7 +3,7 @@ import { handle } from 'frog/next'
 
 const app = new Frog({
     basePath: '/api/frame',
-    title: 'SnarkClaw',
+    title: 'ClawCook',
     // Supply a Hub to enable verification.
     // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
@@ -38,7 +38,7 @@ app.frame('/', (c) => {
                         whiteSpace: 'pre-wrap',
                     }}
                 >
-                    SnarkClaw
+                    ClawCook
                 </div>
                 <div
                     style={{
