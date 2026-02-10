@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@layer base {
+    :root {
+        /* SnarkClaw Dark Theme Variables (HSL) */
+        --background: 0 0% 5%;
+        /* #0D0D0D */
+        --foreground: 0 0% 95%;
+        /* #F2F2F2 */
+
+        --primary: 16 100% 50%;
+        /* #FF4500 */
+        --primary-foreground: 0 0% 100%;
+
+        --secondary: 21 100% 45%;
+        /* #E65100 */
+        --secondary-foreground: 0 0% 100%;
+
+        --accent: 0 0% 15%;
+        --accent-foreground: 0 0% 90%;
+
+        --muted: 0 0% 20%;
+        --muted-foreground: 0 0% 60%;
+
+        --card: 0 0% 7%;
+        --card-foreground: 0 0% 95%;
+
+        --border: 0 0% 20%;
+        --input: 0 0% 20%;
+
+        /* Claw Specifics */
+        --claw-metallic: 0 0% 30%;
+        --claw-glow: 16 100% 60%;
+    }
+}
+
+@theme {
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+
+    --color-primary: hsl(var(--primary));
+    --color-primary-foreground: hsl(var(--primary-foreground));
+
+    --color-secondary: hsl(var(--secondary));
+    --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+    --color-accent: hsl(var(--accent));
+    --color-accent-foreground: hsl(var(--accent-foreground));
+
+    --color-muted: hsl(var(--muted));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+
+    --color-card: hsl(var(--card));
+    --color-card-foreground: hsl(var(--card-foreground));
+
+    --color-border: hsl(var(--border));
+    --color-input: hsl(var(--input));
+
+    --color-claw-metallic: hsl(var(--claw-metallic));
+    --color-claw-glow: hsl(var(--claw-glow));
+}
