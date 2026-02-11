@@ -1,3 +1,5 @@
+/** @jsxImportSource frog/jsx */
+
 import { Button, Frog } from 'frog'
 import { handle } from 'frog/next'
 
@@ -54,10 +56,10 @@ app.frame('/', (c) => {
                     The Roast-to-Earn Clawbot
                 </div>
             </div>
-        ) as any,
+        ),
         intents: [
-            <Button value="roast">Roast Me</Button>,
-        ] as any,
+            <Button key="roast-me" value="roast">Roast Me</Button>,
+        ],
     })
 })
 
@@ -102,10 +104,10 @@ app.frame('/roast', (c) => {
                     (Glitch Animation Placeholder)
                 </div>
             </div>
-        ) as any,
+        ),
         intents: [
-            <Button.Reset>Try Again</Button.Reset>
-        ] as any
+            <Button.Reset key="try-again">Try Again</Button.Reset>
+        ]
     })
 })
 

@@ -3,36 +3,56 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClawMachine } from "@/components/ClawMachine";
-import { generateRoast, RoastResult } from "@/lib/roast-engine";
-import { cn } from "@/lib/utils";
+import type { RoastResult } from "@/lib/roast-engine";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
     const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<RoastResult | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const handleRoast = async () => {
-        if (!username) return;
+        const normalizedUsername = username.trim().replace(/^@/, "");
+        if (!normalizedUsername) return;
+
         setLoading(true);
         setResult(null);
+        setError(null);
 
-        const mockHistory = [{ text: "gm wagmi", timestamp: "now", likes: 10 }];
-        const roastData = await generateRoast(username, mockHistory);
+        try {
+            const response = await fetch("/api/roast", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username: normalizedUsername }),
+            });
 
-        setResult(roastData);
+            const data = await response.json() as RoastResult & { error?: string };
+            if (!response.ok) {
+                throw new Error(data.error ?? "Roast request failed.");
+            }
+
+            setResult(data);
+        } catch (requestError) {
+            const message = requestError instanceof Error ? requestError.message : "Roast request failed.";
+            setError(message);
+        }
+
         setLoading(false);
     };
 
     return (
-        <main className="relative min-h-screen flex flex-col items-center justify-center p-6 sm:p-24 overflow-hidden bg-background">
+        <main className="relative min-h-screen flex flex-col items-center p-6 pb-16 pt-28 sm:px-16 sm:pt-32 overflow-hidden bg-background">
 
             {/* Background Effects */}
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
 
             {/* Header */}
-            <div className="z-10 absolute top-8 left-0 right-0 flex justify-between px-8 sm:px-16 font-mono text-xs sm:text-sm text-neutral-500 uppercase tracking-widest">
+            <div className="z-30 absolute top-8 left-0 right-0 flex justify-between px-8 sm:px-16 font-mono text-xs sm:text-sm text-neutral-500 uppercase tracking-widest">
                 <span className="flex items-center gap-2">
                     <Image
                         src="/clawcook-logo.png"
@@ -43,12 +63,55 @@ export default function Home() {
                     />
                     <span className="font-bold">ClawCook</span>
                 </span>
-                <a href="https://base.org" target="_blank" className="hover:text-primary transition-colors">
-                    System: Online
-                </a>
+                <div className="flex items-center gap-5">
+                    <Link href="/about" className="hover:text-primary transition-colors">
+                        About Us
+                    </Link>
+                    <Link href="/docs" className="hover:text-primary transition-colors">
+                        Docs
+                    </Link>
+                    <Link href="/faq" className="hover:text-primary transition-colors">
+                        FAQ
+                    </Link>
+                    <Link href="/contact" className="hover:text-primary transition-colors">
+                        Contact
+                    </Link>
+                    <Link href="/leaderboard" className="hover:text-primary transition-colors">
+                        Leaderboard
+                    </Link>
+                    <a href="https://base.org" target="_blank" className="hover:text-primary transition-colors">
+                        System: Online
+                    </a>
+                </div>
             </div>
 
-            <div className="z-20 w-full max-w-4xl flex flex-col md:flex-row items-center gap-12 sm:gap-24">
+            <section className="z-20 w-full max-w-5xl text-center mb-14 sm:mb-16">
+                <p className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+                    ClawCook Protocol
+                </p>
+                <h1 className="mt-5 text-4xl leading-tight font-bold tracking-tight text-white sm:text-6xl">
+                    The first roast-to-earn arena for Farcaster personalities.
+                </h1>
+                <p className="mx-auto mt-5 max-w-2xl text-sm text-neutral-300 sm:text-base">
+                    Drop a handle, trigger the claw, and let the engine score your social aura. ClawCook turns playful roasting into an onchain mini-game where every pull has a payoff.
+                </p>
+                <div className="mt-7 flex items-center justify-center gap-3">
+                    <a
+                        href="#roast-console"
+                        className="rounded-xl bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-secondary"
+                    >
+                        Start Roasting
+                    </a>
+                    <Link
+                        href="/about"
+                        className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-xs font-bold uppercase tracking-widest text-neutral-100 transition-colors hover:border-primary/50 hover:text-primary"
+                    >
+                        Learn More
+                    </Link>
+                </div>
+            </section>
+
+            <div id="roast-console" className="z-20 w-full max-w-4xl flex flex-col md:flex-row items-center gap-12 sm:gap-24">
 
                 {/* The Claw Section */}
                 <div className="relative group">
@@ -61,9 +124,9 @@ export default function Home() {
                 {/* Controls Section */}
                 <div className="flex-1 w-full max-w-sm flex flex-col gap-6">
                     <div className="text-center md:text-left space-y-2">
-                        <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white glow-text">
+                        <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white glow-text">
                             ROAST<span className="text-primary">.EXE</span>
-                        </h1>
+                        </h2>
                         <p className="text-neutral-400 text-sm sm:text-base font-mono">
                             Insert handle. Get cooked. Earn $CLAW.
                         </p>
@@ -107,7 +170,22 @@ export default function Home() {
                                     <span>Score: {result.score}</span>
                                 </div>
                                 <h2 className="text-lg font-bold text-white mb-1">{result.profile}</h2>
-                                <p className="text-neutral-300 text-sm italic">"{result.roast}"</p>
+                                <p className="text-neutral-300 text-sm italic">
+                                    &ldquo;{result.roast}&rdquo;
+                                </p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                animate={{ opacity: 1, height: "auto", marginTop: 12 }}
+                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200"
+                            >
+                                {error}
                             </motion.div>
                         )}
                     </AnimatePresence>
