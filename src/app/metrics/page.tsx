@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 interface MetricsPoint {
     timestamp: string;
@@ -229,17 +228,6 @@ export default function MetricsPage() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[560px] w-[560px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
 
             <div className="relative z-20 mx-auto w-full max-w-6xl">
-                <nav className="mb-10 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-neutral-500">
-                    <span>ClawCook / Metrics</span>
-                    <div className="flex items-center gap-4">
-                        <Link href="/about" className="transition-colors hover:text-primary">About</Link>
-                        <Link href="/docs" className="transition-colors hover:text-primary">Docs</Link>
-                        <Link href="/leaderboard" className="transition-colors hover:text-primary">Leaderboard</Link>
-                        <Link href="/analytics" className="transition-colors hover:text-primary">Analytics</Link>
-                        <Link href="/" className="transition-colors hover:text-primary">Back to Roast</Link>
-                    </div>
-                </nav>
-
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Runtime Metrics</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">

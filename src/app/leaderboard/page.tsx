@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import type { LeaderboardEntry, RoastEvent } from "@/lib/roast-store";
 
 type LeaderboardPeriod = "daily" | "weekly" | "all";
@@ -51,19 +50,6 @@ export default function LeaderboardPage() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[560px] w-[560px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
 
             <div className="relative z-20 mx-auto w-full max-w-6xl">
-                <nav className="mb-10 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-neutral-500">
-                    <span>ClawCook / Leaderboard</span>
-                    <div className="flex items-center gap-4">
-                        <Link href="/about" className="transition-colors hover:text-primary">About</Link>
-                        <Link href="/docs" className="transition-colors hover:text-primary">Docs</Link>
-                        <Link href="/faq" className="transition-colors hover:text-primary">FAQ</Link>
-                        <Link href="/contact" className="transition-colors hover:text-primary">Contact</Link>
-                        <Link href="/metrics" className="transition-colors hover:text-primary">Metrics</Link>
-                        <Link href="/analytics" className="transition-colors hover:text-primary">Analytics</Link>
-                        <Link href="/" className="transition-colors hover:text-primary">Back to Roast</Link>
-                    </div>
-                </nav>
-
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Leaderboard</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">

@@ -135,48 +135,6 @@ export default function Home() {
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-150 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
 
-            <div className="z-30 absolute top-8 left-0 right-0 flex justify-between px-8 sm:px-16 font-mono text-xs sm:text-sm text-neutral-500 uppercase tracking-widest">
-                <span className="flex items-center gap-2">
-                    <Image
-                        src="/clawcook-logo.png"
-                        alt="ClawCook Logo"
-                        width={64}
-                        height={64}
-                        className="w-16 h-16 rounded-full object-cover scale-125"
-                    />
-                    <span className="font-bold">ClawCook</span>
-                </span>
-                <div className="flex items-center gap-5">
-                    <Link href="/about" className="hover:text-primary transition-colors">
-                        About Us
-                    </Link>
-                    <Link href="/docs" className="hover:text-primary transition-colors">
-                        Docs
-                    </Link>
-                    <Link href="/faq" className="hover:text-primary transition-colors">
-                        FAQ
-                    </Link> 
-                    <Link href="/contact" className="hover:text-primary transition-colors">
-                        Contact
-                    </Link>
-                    <Link href="/leaderboard" className="hover:text-primary transition-colors">
-                        Leaderboard
-                    </Link>
-                    <Link href="/metrics" className="hover:text-primary transition-colors">
-                        Metrics
-                    </Link>
-                    <Link href="/analytics" className="hover:text-primary transition-colors">
-                        Analytics
-                    </Link>
-                    <Link href="/setup" className="hover:text-primary transition-colors">
-                        Setup
-                    </Link>
-                    <a href="https://base.org" target="_blank" className="hover:text-primary transition-colors">
-                        System: Online
-                    </a>
-                </div>
-            </div>
-
             <section className="z-20 w-full max-w-5xl text-center mb-14 sm:mb-16">
                 <p className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
                     ClawCook Protocol

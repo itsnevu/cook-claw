@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 
 interface MetricsResponse {
     roastEngine: {
@@ -149,15 +148,6 @@ export default function AnalyticsPage() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[560px] w-[560px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
 
             <div className="relative z-20 mx-auto w-full max-w-6xl">
-                <nav className="mb-10 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-neutral-500">
-                    <span>ClawCook / Analytics</span>
-                    <div className="flex items-center gap-4">
-                        <Link href="/metrics" className="transition-colors hover:text-primary">Metrics</Link>
-                        <Link href="/leaderboard" className="transition-colors hover:text-primary">Leaderboard</Link>
-                        <Link href="/" className="transition-colors hover:text-primary">Back to Roast</Link>
-                    </div>
-                </nav>
-
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Analytics</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">

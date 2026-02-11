@@ -35,6 +35,9 @@
 }
 
 @theme {
+    --font-sans: var(--font-jakarta);
+    --font-mono: var(--font-jetbrains-mono);
+
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
 
