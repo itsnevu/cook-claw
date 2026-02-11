@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const jakarta = Plus_Jakarta_Sans({
     subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({
                     <Navbar />
                     <div className="flex-1">{children}</div>
                     <Footer />
+                    <ScrollToTop />
                 </div>
             </body>
         </html>

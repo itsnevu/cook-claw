@@ -66,7 +66,7 @@ export function Footer() {
                                 className="h-12 w-12 rounded-full object-cover"
                             />
                             <div>
-                                <div className="text-lg font-semibold text-white">ClawCook</div>
+                                <div className="text-lg font-semibold text-white font-roxaine">ClawCook</div>
                                 <div className="text-xs font-mono uppercase tracking-widest text-neutral-500">
                                     Roast-to-earn protocol
                                 </div>

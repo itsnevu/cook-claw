@@ -26,7 +26,7 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
                             className="h-10 w-10 rounded-full object-cover"
                         />
                         <div className="text-white">
-                            <div className="text-sm font-semibold uppercase tracking-widest">ClawCook</div>
+                            <div className="text-sm font-semibold tracking-widest font-roxaine">ClawCook</div>
                             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-500">
                                 Roast Protocol
                             </div>
