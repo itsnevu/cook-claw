@@ -6,6 +6,8 @@ import { fetchRecentCastsByFid, normalizeHandle, resolveFidByUsername } from "@/
 import { checkRateLimit } from "@/lib/rate-limit";
 import { generateRoast } from "@/lib/roast-engine";
 import { addRoastEvent } from "@/lib/roast-store";
+import { moderateRoastText } from "@/lib/moderation";
+import { captureServerEvent } from "@/lib/telemetry";
 
 const app = new Frog({
     basePath: "/api/frame",
@@ -77,8 +79,13 @@ app.frame("/roast", async (c) => {
 
     try {
         const fid = await resolveFidByUsername(username);
+        const distinctId = `fid:${fid}`;
         const rateLimit = await checkRateLimit(fid, username);
         if (!rateLimit.allowed) {
+            await captureServerEvent("frame_roast_rate_limited", distinctId, {
+                username,
+                reason: rateLimit.reason ?? "rate_limit",
+            });
             return c.res({
                 image: (
                     <div
@@ -106,10 +113,50 @@ app.frame("/roast", async (c) => {
 
         const history = await fetchRecentCastsByFid(fid);
         const result = await generateRoast(username, history);
+        const moderation = await moderateRoastText(result.roast);
+        if (!moderation.allowed) {
+            await captureServerEvent("frame_roast_moderation_blocked", distinctId, {
+                username,
+                profile: result.profile,
+                score: result.score,
+                reason: moderation.reason ?? "moderation_blocked",
+            });
+            return c.res({
+                image: (
+                    <div
+                        style={{
+                            alignItems: "center",
+                            background: "linear-gradient(to right, #0D0D0D, #3A1010)",
+                            display: "flex",
+                            flexDirection: "column",
+                            height: "100%",
+                            justifyContent: "center",
+                            textAlign: "center",
+                            width: "100%",
+                            padding: "0 80px",
+                        }}
+                    >
+                        <div style={{ color: "#FF3B30", fontSize: 42 }}>Safety Blocked</div>
+                        <div style={{ color: "white", fontSize: 20, marginTop: 12 }}>
+                            {moderation.reason ?? "Output blocked by safety policy."}
+                        </div>
+                    </div>
+                ),
+                intents: [
+                    <Button.Reset key="reset-moderation">Try Again</Button.Reset>,
+                ],
+            });
+        }
+
         await addRoastEvent({
             username,
             profile: result.profile,
             roast: result.roast,
+            score: result.score,
+        });
+        await captureServerEvent("frame_roast_success", distinctId, {
+            username,
+            profile: result.profile,
             score: result.score,
         });
 
@@ -143,6 +190,7 @@ app.frame("/roast", async (c) => {
         });
     } catch (error) {
         const message = error instanceof Error ? error.message : "Failed to roast profile.";
+        await captureServerEvent("frame_roast_error", "anonymous", { message });
         return c.res({
             image: (
                 <div

@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { getRoastAggregateMetrics } from "@/lib/roast-store";
+import { captureServerEvent } from "@/lib/telemetry";
 
 const GECKO_BASE = "https://api.coingecko.com/api/v3";
 const VS_CURRENCY = "usd";
 const CLAW_ID = process.env.COINGECKO_CLAW_ID ?? "claw";
+const CLAW_TOKEN_ADDRESS = process.env.CLAW_TOKEN_ADDRESS ?? "";
+const DEXSCREENER_BASE = "https://api.dexscreener.com/latest/dex/tokens";
 
 interface TickerResponse {
     btc: number | null;
@@ -52,12 +55,62 @@ async function fetchClawMarketData(): Promise<{ claw: number | null; fdv: number
     };
 }
 
+async function fetchClawDexFallback(): Promise<{ claw: number | null; fdv: number | null }> {
+    if (!CLAW_TOKEN_ADDRESS) {
+        return { claw: null, fdv: null };
+    }
+
+    const url = `${DEXSCREENER_BASE}/${encodeURIComponent(CLAW_TOKEN_ADDRESS)}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) {
+        return { claw: null, fdv: null };
+    }
+
+    const data = await res.json() as {
+        pairs?: Array<{
+            priceUsd?: string;
+            fdv?: number;
+            liquidity?: { usd?: number };
+        }>;
+    };
+
+    const pairs = data.pairs ?? [];
+    if (pairs.length === 0) {
+        return { claw: null, fdv: null };
+    }
+
+    const bestPair = [...pairs].sort(
+        (a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0)
+    )[0];
+
+    const price = bestPair.priceUsd ? Number(bestPair.priceUsd) : null;
+    const parsedPrice = price !== null && Number.isFinite(price) ? price : null;
+    const parsedFdv = typeof bestPair.fdv === "number" && Number.isFinite(bestPair.fdv) ? bestPair.fdv : null;
+
+    return {
+        claw: parsedPrice,
+        fdv: parsedFdv,
+    };
+}
+
 export async function GET() {
-    const [{ btc, eth }, { claw, fdv }, allTime] = await Promise.all([
+    const [{ btc, eth }, clawMarket, clawDexFallback, allTime] = await Promise.all([
         fetchSimplePrices(),
         fetchClawMarketData(),
+        fetchClawDexFallback(),
         getRoastAggregateMetrics("all"),
     ]);
+
+    const claw = clawMarket.claw ?? clawDexFallback.claw;
+    const fdv = clawMarket.fdv ?? clawDexFallback.fdv;
+    const usedDexFallback = clawMarket.claw === null && clawDexFallback.claw !== null;
+
+    if (usedDexFallback) {
+        await captureServerEvent("ticker_claw_dex_fallback_used", "system:ticker", {
+            clawPrice: claw,
+            fdv,
+        });
+    }
 
     const payload: TickerResponse = {
         btc,

@@ -32,6 +32,13 @@ OPENAI_API_KEY=your_openai_api_key
 # METRICS_API_TOKEN=<your-metrics-token>
 # optional: coin id used for CLAW price/fdv in /api/ticker
 # COINGECKO_CLAW_ID=claw
+# optional: fallback token address for DexScreener if CoinGecko lacks CLAW price/fdv
+# CLAW_TOKEN_ADDRESS=0x...
+# optional: OpenAI moderation model override
+# OPENAI_MODERATION_MODEL=omni-moderation-latest
+# optional: server-side product analytics
+# POSTHOG_API_KEY=phc_xxx
+# POSTHOG_HOST=https://app.posthog.com
 ```
 
 `NEYNAR_API_KEY` is required for fetching real Farcaster casts in `POST /api/roast`.
@@ -41,7 +48,10 @@ If `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set, roast history 
 ### API Routes
 
 - `POST /api/roast` -> generate roast from real Farcaster cast history.
+  - Includes moderation check for roast output before returning/storing.
+  - Emits optional PostHog events when POSTHOG env is configured.
 - `GET /api/ticker` -> live BTC/ETH/CLAW/FDV from CoinGecko + internal users/roasts stats.
+  - CLAW price/fdv falls back to DexScreener when `CLAW_TOKEN_ADDRESS` is configured.
 - `GET /api/leaderboard` -> returns leaderboard and recent roast events.
   - Query params: `period=daily|weekly|all`, `limit`, `minAttempts`, `recent`
 - `GET /api/metrics` -> runtime observability snapshot (roast engine, rate-limit, aggregate stats)
