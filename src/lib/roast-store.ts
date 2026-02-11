@@ -20,6 +20,14 @@ export interface LeaderboardEntry {
 
 export type LeaderboardPeriod = "daily" | "weekly" | "all";
 
+export interface RoastAggregateMetrics {
+    totalRoasts: number;
+    uniqueUsers: number;
+    averageScore: number;
+    bestScore: number;
+    profileBreakdown: Record<RoastProfile, number>;
+}
+
 interface RoastStoreState {
     events: RoastEvent[];
 }
@@ -182,4 +190,37 @@ export async function getLeaderboard(
     return entries
         .sort((a, b) => b.averageScore - a.averageScore || b.bestScore - a.bestScore || b.attempts - a.attempts)
         .slice(0, limit);
+}
+
+export async function getRoastAggregateMetrics(period: LeaderboardPeriod = "all"): Promise<RoastAggregateMetrics> {
+    const events = filterEventsByPeriod(await getRecentRoasts(MAX_EVENTS), period);
+    const profileBreakdown: Record<RoastProfile, number> = {
+        "Larping Dev": 0,
+        "Vibes-only Trader": 0,
+        "Reply Guy": 0,
+        "Unknown": 0,
+    };
+
+    const users = new Set<string>();
+    let scoreSum = 0;
+    let bestScore = 0;
+
+    for (const event of events) {
+        users.add(event.username.toLowerCase());
+        profileBreakdown[event.profile] += 1;
+        scoreSum += event.score;
+        if (event.score > bestScore) {
+            bestScore = event.score;
+        }
+    }
+
+    const averageScore = events.length > 0 ? Math.round((scoreSum / events.length) * 10) / 10 : 0;
+
+    return {
+        totalRoasts: events.length,
+        uniqueUsers: users.size,
+        averageScore,
+        bestScore,
+        profileBreakdown,
+    };
 }

@@ -12,6 +12,14 @@ export interface RoastResult {
     score: number; // 0-100
 }
 
+export interface RoastEngineMetrics {
+    totalRequests: number;
+    aiSuccess: number;
+    aiFailure: number;
+    fallbackUsed: number;
+    lastAiErrorAt?: string;
+}
+
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/responses";
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
 
@@ -38,6 +46,26 @@ const MOCK_ROASTS: Record<RoastProfile, string[]> = {
 };
 
 const PROFILE_SET = new Set<RoastProfile>(["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"]);
+
+declare global {
+    var __clawcookRoastEngineMetrics: RoastEngineMetrics | undefined;
+}
+
+function getMetricsStore(): RoastEngineMetrics {
+    if (!globalThis.__clawcookRoastEngineMetrics) {
+        globalThis.__clawcookRoastEngineMetrics = {
+            totalRequests: 0,
+            aiSuccess: 0,
+            aiFailure: 0,
+            fallbackUsed: 0,
+        };
+    }
+    return globalThis.__clawcookRoastEngineMetrics;
+}
+
+export function getRoastEngineMetrics(): RoastEngineMetrics {
+    return { ...getMetricsStore() };
+}
 
 function clampScore(score: number): number {
     return Math.max(0, Math.min(100, Math.round(score)));
@@ -212,14 +240,21 @@ async function generateRoastWithOpenAI(username: string, history: Cast[]): Promi
 }
 
 export async function generateRoast(username: string, history: Cast[]): Promise<RoastResult> {
+    const metrics = getMetricsStore();
+    metrics.totalRequests += 1;
+
     try {
         const aiResult = await generateRoastWithOpenAI(username, history);
         if (aiResult) {
+            metrics.aiSuccess += 1;
             return aiResult;
         }
     } catch (error) {
+        metrics.aiFailure += 1;
+        metrics.lastAiErrorAt = new Date().toISOString();
         console.error("generateRoast: AI path failed, using fallback.", error);
     }
 
+    metrics.fallbackUsed += 1;
     return buildFallbackRoast(username, history);
 }

@@ -1,17 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClawMachine } from "@/components/ClawMachine";
 import type { RoastResult } from "@/lib/roast-engine";
 import Image from "next/image";
 import Link from "next/link";
 
+interface TickerData {
+    btc: number | null;
+    eth: number | null;
+    claw: number | null;
+    fdv: number | null;
+    users: number;
+    roasts: number;
+}
+
+const USD_COMPACT = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 1,
+});
+
+const USD_2 = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
+const NUMBER_INT = new Intl.NumberFormat("en-US");
+
+function formatUsd(value: number | null, tiny = false): string {
+    if (value === null) {
+        return "--";
+    }
+    if (tiny) {
+        return value < 0.01 ? `$${value.toFixed(6)}` : USD_2.format(value);
+    }
+    return USD_2.format(value);
+}
+
 export default function Home() {
     const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<RoastResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [ticker, setTicker] = useState<TickerData>({
+        btc: null,
+        eth: null,
+        claw: null,
+        fdv: null,
+        users: 0,
+        roasts: 0,
+    });
+
+    useEffect(() => {
+        let mounted = true;
+
+        const pullTicker = async () => {
+            try {
+                const res = await fetch("/api/ticker", { cache: "no-store" });
+                if (!res.ok) {
+                    return;
+                }
+                const data = await res.json() as TickerData;
+                if (mounted) {
+                    setTicker(data);
+                }
+            } catch {
+                // Keep previous ticker snapshot on transient failures.
+            }
+        };
+
+        pullTicker();
+        const timer = setInterval(pullTicker, 60_000);
+        return () => {
+            mounted = false;
+            clearInterval(timer);
+        };
+    }, []);
 
     const handleRoast = async () => {
         const normalizedUsername = username.trim().replace(/^@/, "");
@@ -49,7 +118,7 @@ export default function Home() {
 
             {/* Background Effects */}
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-150 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
 
             {/* Header */}
             <div className="z-30 absolute top-8 left-0 right-0 flex justify-between px-8 sm:px-16 font-mono text-xs sm:text-sm text-neutral-500 uppercase tracking-widest">
@@ -78,6 +147,9 @@ export default function Home() {
                     </Link>
                     <Link href="/leaderboard" className="hover:text-primary transition-colors">
                         Leaderboard
+                    </Link>
+                    <Link href="/metrics" className="hover:text-primary transition-colors">
+                        Metrics
                     </Link>
                     <a href="https://base.org" target="_blank" className="hover:text-primary transition-colors">
                         System: Online
@@ -195,12 +267,12 @@ export default function Home() {
             {/* Footer Ticker mockup */}
             <div className="absolute bottom-0 left-0 right-0 h-10 bg-black/50 border-t border-white/5 flex items-center px-4 font-mono text-[10px] sm:text-xs text-neutral-600 overflow-hidden whitespace-nowrap">
                 <div className="animate-marquee flex gap-8">
-                    <span>BTC: $98,234.12</span>
-                    <span>ETH: $3,452.90</span>
-                    <span>CLAW: $0.00042</span>
-                    <span>FDV: $4.2M</span>
-                    <span>USERS: 12,402</span>
-                    <span>ROASTS: 145,201</span>
+                    <span>BTC: {formatUsd(ticker.btc)}</span>
+                    <span>ETH: {formatUsd(ticker.eth)}</span>
+                    <span>CLAW: {formatUsd(ticker.claw, true)}</span>
+                    <span>FDV: {ticker.fdv === null ? "--" : USD_COMPACT.format(ticker.fdv)}</span>
+                    <span>USERS: {NUMBER_INT.format(ticker.users)}</span>
+                    <span>ROASTS: {NUMBER_INT.format(ticker.roasts)}</span>
                 </div>
             </div>
         </main >

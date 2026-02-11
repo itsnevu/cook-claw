@@ -21,6 +21,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
         period,
+        minAttempts,
         leaderboard: await getLeaderboard(limit, minAttempts, period),
         recentRoasts: await getRecentRoasts(recent),
     });

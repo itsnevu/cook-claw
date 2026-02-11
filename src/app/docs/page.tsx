@@ -43,6 +43,9 @@ export default function DocsPage() {
                         <Link href="/leaderboard" className="transition-colors hover:text-primary">
                             Leaderboard
                         </Link>
+                        <Link href="/metrics" className="transition-colors hover:text-primary">
+                            Metrics
+                        </Link>
                         <Link href="/" className="transition-colors hover:text-primary">
                             Back to Roast
                         </Link>

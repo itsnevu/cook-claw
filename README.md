@@ -28,6 +28,10 @@ OPENAI_API_KEY=your_openai_api_key
 # optional for persistent roast history + distributed rate limiting
 # UPSTASH_REDIS_REST_URL=https://<your-endpoint>.upstash.io
 # UPSTASH_REDIS_REST_TOKEN=<your-token>
+# optional: protect /api/metrics
+# METRICS_API_TOKEN=<your-metrics-token>
+# optional: coin id used for CLAW price/fdv in /api/ticker
+# COINGECKO_CLAW_ID=claw
 ```
 
 `NEYNAR_API_KEY` is required for fetching real Farcaster casts in `POST /api/roast`.
@@ -37,8 +41,14 @@ If `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set, roast history 
 ### API Routes
 
 - `POST /api/roast` -> generate roast from real Farcaster cast history.
+- `GET /api/ticker` -> live BTC/ETH/CLAW/FDV from CoinGecko + internal users/roasts stats.
 - `GET /api/leaderboard` -> returns leaderboard and recent roast events.
   - Query params: `period=daily|weekly|all`, `limit`, `minAttempts`, `recent`
+- `GET /api/metrics` -> runtime observability snapshot (roast engine, rate-limit, aggregate stats)
+  - If `METRICS_API_TOKEN` is set, send `x-metrics-token` (or `Authorization: Bearer ...`)
+  - Optional query: `history` (2-180 samples, default 60)
+  - Optional query: `since` and `until` (ISO datetime filter for history)
+  - Optional query: `format=csv` (export history as CSV)
 - `GET/POST /api/frame/[[...routes]]` -> Farcaster Frame flow wired to real roast engine.
 
 Without Redis env, leaderboard storage/rate limit fallback to process memory (runtime only).

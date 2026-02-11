@@ -3,6 +3,14 @@ export interface RateLimitStatus {
     reason?: string;
 }
 
+export interface RateLimitMetrics {
+    allowed: number;
+    blockedUserMinute: number;
+    blockedUserDaily: number;
+    blockedIpMinute: number;
+    redisFallbacks: number;
+}
+
 interface RateLimitOptions {
     ip?: string;
 }
@@ -19,6 +27,7 @@ const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 declare global {
     var __clawcookRateLimitMemory: Map<string, { count: number; expiresAt: number }> | undefined;
+    var __clawcookRateLimitMetrics: RateLimitMetrics | undefined;
 }
 
 function getMemoryBucketStore(): Map<string, { count: number; expiresAt: number }> {
@@ -26,6 +35,23 @@ function getMemoryBucketStore(): Map<string, { count: number; expiresAt: number 
         globalThis.__clawcookRateLimitMemory = new Map();
     }
     return globalThis.__clawcookRateLimitMemory;
+}
+
+function getMetricsStore(): RateLimitMetrics {
+    if (!globalThis.__clawcookRateLimitMetrics) {
+        globalThis.__clawcookRateLimitMetrics = {
+            allowed: 0,
+            blockedUserMinute: 0,
+            blockedUserDaily: 0,
+            blockedIpMinute: 0,
+            redisFallbacks: 0,
+        };
+    }
+    return globalThis.__clawcookRateLimitMetrics;
+}
+
+export function getRateLimitMetrics(): RateLimitMetrics {
+    return { ...getMetricsStore() };
 }
 
 function getClientIp(rawIp: string | undefined): string {
@@ -100,6 +126,7 @@ async function incrementCounter(key: string, ttlSeconds: number): Promise<number
         try {
             return await incrementWithRedisAndExpire(key, ttlSeconds);
         } catch (error) {
+            getMetricsStore().redisFallbacks += 1;
             console.error("rate-limit: redis unavailable, using memory fallback.", error);
         }
     }
@@ -108,6 +135,7 @@ async function incrementCounter(key: string, ttlSeconds: number): Promise<number
 }
 
 export async function checkRateLimit(fid: number, username: string, options: RateLimitOptions = {}): Promise<RateLimitStatus> {
+    const metrics = getMetricsStore();
     const normalizedUsername = username.trim().replace(/^@/, "").toLowerCase();
     const ip = getClientIp(options.ip);
     const minute = minuteBucket();
@@ -124,6 +152,7 @@ export async function checkRateLimit(fid: number, username: string, options: Rat
     ]);
 
     if (userMinuteCount > USER_WINDOW_LIMIT) {
+        metrics.blockedUserMinute += 1;
         return {
             allowed: false,
             reason: `Too many requests. Try again in ${USER_WINDOW_SECONDS} seconds.`,
@@ -131,6 +160,7 @@ export async function checkRateLimit(fid: number, username: string, options: Rat
     }
 
     if (userDailyCount > USER_DAILY_LIMIT) {
+        metrics.blockedUserDaily += 1;
         return {
             allowed: false,
             reason: `Daily roast limit reached (${USER_DAILY_LIMIT}). Come back tomorrow.`,
@@ -138,11 +168,13 @@ export async function checkRateLimit(fid: number, username: string, options: Rat
     }
 
     if (ipMinuteCount > IP_WINDOW_LIMIT) {
+        metrics.blockedIpMinute += 1;
         return {
             allowed: false,
             reason: "Network is sending requests too quickly. Slow down and retry.",
         };
     }
 
+    metrics.allowed += 1;
     return { allowed: true };
 }

@@ -8,6 +8,7 @@ type LeaderboardPeriod = "daily" | "weekly" | "all";
 
 interface LeaderboardResponse {
     period: LeaderboardPeriod;
+    minAttempts: number;
     leaderboard: LeaderboardEntry[];
     recentRoasts: RoastEvent[];
 }
@@ -17,13 +18,17 @@ export default function LeaderboardPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [period, setPeriod] = useState<LeaderboardPeriod>("all");
+    const [minAttempts, setMinAttempts] = useState(1);
 
     useEffect(() => {
         const run = async () => {
             try {
                 setLoading(true);
                 setError(null);
-                const res = await fetch(`/api/leaderboard?limit=20&recent=12&period=${period}`, { cache: "no-store" });
+                const res = await fetch(
+                    `/api/leaderboard?limit=20&recent=12&period=${period}&minAttempts=${minAttempts}`,
+                    { cache: "no-store" }
+                );
                 const payload = await res.json() as LeaderboardResponse & { error?: string };
                 if (!res.ok) {
                     throw new Error(payload.error ?? "Failed to fetch leaderboard.");
@@ -38,7 +43,7 @@ export default function LeaderboardPage() {
         };
 
         run();
-    }, [period]);
+    }, [period, minAttempts]);
 
     return (
         <main className="relative min-h-screen overflow-hidden bg-background px-6 pb-16 pt-28 sm:px-16 sm:pt-32">
@@ -53,6 +58,7 @@ export default function LeaderboardPage() {
                         <Link href="/docs" className="transition-colors hover:text-primary">Docs</Link>
                         <Link href="/faq" className="transition-colors hover:text-primary">FAQ</Link>
                         <Link href="/contact" className="transition-colors hover:text-primary">Contact</Link>
+                        <Link href="/metrics" className="transition-colors hover:text-primary">Metrics</Link>
                         <Link href="/" className="transition-colors hover:text-primary">Back to Roast</Link>
                     </div>
                 </nav>
@@ -78,6 +84,23 @@ export default function LeaderboardPage() {
                                 }`}
                             >
                                 {value === "all" ? "All Time" : value}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="mt-4 flex items-center gap-2">
+                        <span className="text-xs font-mono uppercase tracking-widest text-neutral-500">Min Runs</span>
+                        {[1, 3, 5].map((value) => (
+                            <button
+                                key={value}
+                                type="button"
+                                onClick={() => setMinAttempts(value)}
+                                className={`rounded-lg px-3 py-1.5 text-xs font-mono uppercase tracking-widest transition-colors ${
+                                    minAttempts === value
+                                        ? "bg-primary text-white"
+                                        : "border border-white/20 bg-white/5 text-neutral-300 hover:border-primary/40"
+                                }`}
+                            >
+                                {value}
                             </button>
                         ))}
                     </div>
