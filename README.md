@@ -72,6 +72,7 @@ If `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set, roast history 
   - Optional query: `history` (2-180 samples, default 60)
   - Optional query: `since` and `until` (ISO datetime filter for history)
   - Optional query: `format=csv` (export history as CSV)
+- `GET /api/setup/status` -> integration readiness check (required/optional env + basic API reachability).
 - `/analytics` page reads protected metrics API and supports the same token via UI input.
 - `GET/POST /api/frame/[[...routes]]` -> Farcaster Frame flow wired to real roast engine.
 - `POST /api/dev/seed` -> generate local/dev sample roast data for dashboard testing (disabled in production).

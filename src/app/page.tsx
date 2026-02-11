@@ -168,6 +168,9 @@ export default function Home() {
                     <Link href="/analytics" className="hover:text-primary transition-colors">
                         Analytics
                     </Link>
+                    <Link href="/setup" className="hover:text-primary transition-colors">
+                        Setup
+                    </Link>
                     <a href="https://base.org" target="_blank" className="hover:text-primary transition-colors">
                         System: Online
                     </a>
