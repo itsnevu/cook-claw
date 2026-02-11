@@ -14,7 +14,8 @@ export async function POST(req: Request) {
         }
 
         const fid = await resolveFidByUsername(username);
-        const rateLimitStatus = await checkRateLimit(fid, username);
+        const forwardedFor = req.headers.get("x-forwarded-for") ?? undefined;
+        const rateLimitStatus = await checkRateLimit(fid, username, { ip: forwardedFor });
 
         if (!rateLimitStatus.allowed) {
             return NextResponse.json(
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
 
         const history = await fetchRecentCastsByFid(fid);
         const result = await generateRoast(username, history);
-        addRoastEvent({
+        await addRoastEvent({
             username,
             profile: result.profile,
             roast: result.roast,

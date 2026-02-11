@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { LeaderboardEntry, RoastEvent } from "@/lib/roast-store";
 
+type LeaderboardPeriod = "daily" | "weekly" | "all";
+
 interface LeaderboardResponse {
+    period: LeaderboardPeriod;
     leaderboard: LeaderboardEntry[];
     recentRoasts: RoastEvent[];
 }
@@ -13,13 +16,14 @@ export default function LeaderboardPage() {
     const [data, setData] = useState<LeaderboardResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [period, setPeriod] = useState<LeaderboardPeriod>("all");
 
     useEffect(() => {
         const run = async () => {
             try {
                 setLoading(true);
                 setError(null);
-                const res = await fetch("/api/leaderboard?limit=20&recent=12", { cache: "no-store" });
+                const res = await fetch(`/api/leaderboard?limit=20&recent=12&period=${period}`, { cache: "no-store" });
                 const payload = await res.json() as LeaderboardResponse & { error?: string };
                 if (!res.ok) {
                     throw new Error(payload.error ?? "Failed to fetch leaderboard.");
@@ -34,7 +38,7 @@ export default function LeaderboardPage() {
         };
 
         run();
-    }, []);
+    }, [period]);
 
     return (
         <main className="relative min-h-screen overflow-hidden bg-background px-6 pb-16 pt-28 sm:px-16 sm:pt-32">
@@ -59,8 +63,24 @@ export default function LeaderboardPage() {
                         Top roasted handles by average score.
                     </h1>
                     <p className="mt-4 text-sm text-neutral-300">
-                        This is in-memory data for current runtime. Wire a DB next for persistent rankings.
+                        Data is shared when Redis is configured. Otherwise this view shows runtime memory only.
                     </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                        {(["daily", "weekly", "all"] as LeaderboardPeriod[]).map((value) => (
+                            <button
+                                key={value}
+                                type="button"
+                                onClick={() => setPeriod(value)}
+                                className={`rounded-lg px-3 py-2 text-xs font-mono uppercase tracking-widest transition-colors ${
+                                    period === value
+                                        ? "bg-primary text-white"
+                                        : "border border-white/20 bg-white/5 text-neutral-300 hover:border-primary/40"
+                                }`}
+                            >
+                                {value === "all" ? "All Time" : value}
+                            </button>
+                        ))}
+                    </div>
                 </section>
 
                 {loading && <p className="mt-6 text-sm text-neutral-400">Loading leaderboard...</p>}

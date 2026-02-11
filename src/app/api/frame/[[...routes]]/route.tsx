@@ -1,115 +1,173 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, Frog } from 'frog'
-import { handle } from 'frog/next'
+import { Button, Frog, TextInput } from "frog";
+import { handle } from "frog/next";
+import { fetchRecentCastsByFid, normalizeHandle, resolveFidByUsername } from "@/lib/farcaster";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { generateRoast } from "@/lib/roast-engine";
+import { addRoastEvent } from "@/lib/roast-store";
 
 const app = new Frog({
-    basePath: '/api/frame',
-    title: 'ClawCook',
-    // Supply a Hub to enable verification.
-    // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
-})
+    basePath: "/api/frame",
+    title: "ClawCook",
+});
 
-app.frame('/', (c) => {
+app.frame("/", (c) => {
     return c.res({
-        action: '/roast',
+        action: "/roast",
         image: (
             <div
                 style={{
-                    alignItems: 'center',
-                    background: 'linear-gradient(to right, #0D0D0D, #1a1a1a)',
-                    backgroundSize: '100% 100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexWrap: 'nowrap',
-                    height: '100%',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    width: '100%',
+                    alignItems: "center",
+                    background: "linear-gradient(to right, #0D0D0D, #1a1a1a)",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    width: "100%",
+                    padding: "0 80px",
                 }}
             >
-                <div
-                    style={{
-                        color: '#FF4500',
-                        fontSize: 60,
-                        fontStyle: 'normal',
-                        letterSpacing: '-0.025em',
-                        lineHeight: 1.4,
-                        marginTop: 30,
-                        padding: '0 120px',
-                        whiteSpace: 'pre-wrap',
-                    }}
-                >
-                    ClawCook
-                </div>
-                <div
-                    style={{
-                        color: 'white',
-                        fontSize: 30,
-                        fontStyle: 'normal',
-                        letterSpacing: '-0.025em',
-                        marginTop: 10,
-                        padding: '0 120px',
-                        whiteSpace: 'pre-wrap',
-                    }}
-                >
-                    The Roast-to-Earn Clawbot
+                <div style={{ color: "#FF4500", fontSize: 62, lineHeight: 1.2 }}>ClawCook</div>
+                <div style={{ color: "white", fontSize: 28, marginTop: 12 }}>Roast-to-Earn Clawbot</div>
+                <div style={{ color: "#B8B8B8", fontSize: 22, marginTop: 20 }}>
+                    Enter Farcaster handle and pull the claw.
                 </div>
             </div>
         ),
         intents: [
-            <Button key="roast-me" value="roast">Roast Me</Button>,
+            <TextInput key="input-handle" placeholder="@farcaster_handle" />,
+            <Button key="start-roast" value="roast">Roast Me</Button>,
         ],
-    })
-})
+    });
+});
 
-app.frame('/roast', (c) => {
-    return c.res({
-        image: (
-            <div
-                style={{
-                    alignItems: 'center',
-                    background: 'linear-gradient(to right, #0D0D0D, #432818)',
-                    backgroundSize: '100% 100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexWrap: 'nowrap',
-                    height: '100%',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    width: '100%',
-                }}
-            >
+app.frame("/roast", async (c) => {
+    const username = normalizeHandle(c.inputText ?? "");
+    if (!username) {
+        return c.res({
+            action: "/roast",
+            image: (
                 <div
                     style={{
-                        color: '#FF0000',
-                        fontSize: 50,
-                        fontStyle: 'normal',
-                        letterSpacing: '-0.025em',
-                        lineHeight: 1.4,
-                        marginTop: 30,
-                        padding: '0 120px',
-                        whiteSpace: 'pre-wrap',
+                        alignItems: "center",
+                        background: "linear-gradient(to right, #0D0D0D, #2A1A12)",
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        width: "100%",
+                        padding: "0 80px",
                     }}
                 >
-                    Analyzing Profile...
+                    <div style={{ color: "#FF6F3C", fontSize: 50 }}>Handle missing</div>
+                    <div style={{ color: "white", fontSize: 24, marginTop: 12 }}>
+                        Enter a Farcaster handle to continue.
+                    </div>
                 </div>
+            ),
+            intents: [
+                <TextInput key="input-handle-retry" placeholder="@farcaster_handle" />,
+                <Button key="retry-roast" value="retry">Try Again</Button>,
+            ],
+        });
+    }
+
+    try {
+        const fid = await resolveFidByUsername(username);
+        const rateLimit = await checkRateLimit(fid, username);
+        if (!rateLimit.allowed) {
+            return c.res({
+                image: (
+                    <div
+                        style={{
+                            alignItems: "center",
+                            background: "linear-gradient(to right, #0D0D0D, #3A1010)",
+                            display: "flex",
+                            flexDirection: "column",
+                            height: "100%",
+                            justifyContent: "center",
+                            textAlign: "center",
+                            width: "100%",
+                            padding: "0 80px",
+                        }}
+                    >
+                        <div style={{ color: "#FF3B30", fontSize: 46 }}>Rate Limited</div>
+                        <div style={{ color: "white", fontSize: 22, marginTop: 12 }}>{rateLimit.reason}</div>
+                    </div>
+                ),
+                intents: [
+                    <Button.Reset key="reset-rate-limit">Back</Button.Reset>,
+                ],
+            });
+        }
+
+        const history = await fetchRecentCastsByFid(fid);
+        const result = await generateRoast(username, history);
+        await addRoastEvent({
+            username,
+            profile: result.profile,
+            roast: result.roast,
+            score: result.score,
+        });
+
+        return c.res({
+            image: (
                 <div
                     style={{
-                        color: 'white',
-                        fontSize: 24,
-                        marginTop: 20
+                        alignItems: "center",
+                        background: "linear-gradient(to right, #0D0D0D, #432818)",
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        width: "100%",
+                        padding: "0 80px",
                     }}
                 >
-                    (Glitch Animation Placeholder)
+                    <div style={{ color: "#FF4500", fontSize: 36 }}>
+                        @{username} / Score {result.score}
+                    </div>
+                    <div style={{ color: "#FFD3C2", fontSize: 24, marginTop: 10 }}>{result.profile}</div>
+                    <div style={{ color: "white", fontSize: 24, marginTop: 18, lineHeight: 1.35 }}>
+                        &ldquo;{result.roast}&rdquo;
+                    </div>
                 </div>
-            </div>
-        ),
-        intents: [
-            <Button.Reset key="try-again">Try Again</Button.Reset>
-        ]
-    })
-})
+            ),
+            intents: [
+                <Button.Reset key="reset-roast">Roast Another</Button.Reset>,
+            ],
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to roast profile.";
+        return c.res({
+            image: (
+                <div
+                    style={{
+                        alignItems: "center",
+                        background: "linear-gradient(to right, #0D0D0D, #3A1010)",
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        width: "100%",
+                        padding: "0 80px",
+                    }}
+                >
+                    <div style={{ color: "#FF3B30", fontSize: 44 }}>Roast Failed</div>
+                    <div style={{ color: "white", fontSize: 22, marginTop: 12 }}>{message}</div>
+                </div>
+            ),
+            intents: [
+                <Button.Reset key="reset-error">Try Again</Button.Reset>,
+            ],
+        });
+    }
+});
 
-export const GET = handle(app)
-export const POST = handle(app)
+export const GET = handle(app);
+export const POST = handle(app);

@@ -25,17 +25,23 @@ NEYNAR_API_KEY=your_neynar_api_key
 OPENAI_API_KEY=your_openai_api_key
 # optional
 # OPENAI_MODEL=gpt-4.1-mini
+# optional for persistent roast history + distributed rate limiting
+# UPSTASH_REDIS_REST_URL=https://<your-endpoint>.upstash.io
+# UPSTASH_REDIS_REST_TOKEN=<your-token>
 ```
 
 `NEYNAR_API_KEY` is required for fetching real Farcaster casts in `POST /api/roast`.
 `OPENAI_API_KEY` enables AI roast generation. If missing, the app falls back to heuristic roast mode.
+If `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set, roast history and rate limiting become shared/persistent across instances.
 
 ### API Routes
 
 - `POST /api/roast` -> generate roast from real Farcaster cast history.
-- `GET /api/leaderboard` -> returns current in-memory leaderboard and recent roast events.
+- `GET /api/leaderboard` -> returns leaderboard and recent roast events.
+  - Query params: `period=daily|weekly|all`, `limit`, `minAttempts`, `recent`
+- `GET/POST /api/frame/[[...routes]]` -> Farcaster Frame flow wired to real roast engine.
 
-Leaderboard storage is currently memory-based (runtime only). Use a database/KV for persistent production data.
+Without Redis env, leaderboard storage/rate limit fallback to process memory (runtime only).
 
 You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
 
