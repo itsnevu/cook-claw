@@ -47,6 +47,11 @@ OPENAI_API_KEY=your_openai_api_key
 # optional: sentry error monitoring
 # SENTRY_DSN=https://<key>@o0.ingest.sentry.io/<project>
 # NEXT_PUBLIC_SENTRY_DSN=https://<public-key>@o0.ingest.sentry.io/<project>
+# optional: secure dev seed endpoint
+# DEV_SEED_TOKEN=dev_seed_secret
+# optional: enable Prisma database mode (DB-first with fallback)
+# PRISMA_DB_ENABLED=true
+# DATABASE_URL=file:./dev.db
 ```
 
 `NEYNAR_API_KEY` is required for fetching real Farcaster casts in `POST /api/roast`.
@@ -69,8 +74,25 @@ If `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set, roast history 
   - Optional query: `format=csv` (export history as CSV)
 - `/analytics` page reads protected metrics API and supports the same token via UI input.
 - `GET/POST /api/frame/[[...routes]]` -> Farcaster Frame flow wired to real roast engine.
+- `POST /api/dev/seed` -> generate local/dev sample roast data for dashboard testing (disabled in production).
+  - Body: `{"count":120,"daysBack":30}`
+  - Optional auth: header `x-dev-seed-token` when `DEV_SEED_TOKEN` is set.
 
 Without Redis env, leaderboard storage/rate limit fallback to process memory (runtime only).
+
+### Prisma (Step 1 Foundation)
+
+This repo now includes Prisma schema + initial migration in `prisma/`.
+
+1. Set env:
+   - `PRISMA_DB_ENABLED=true`
+   - `DATABASE_URL=file:./dev.db` (or your postgres URL)
+2. Generate client:
+   - `npx prisma generate`
+3. Apply migration:
+   - `npx prisma migrate deploy`
+
+When disabled (`PRISMA_DB_ENABLED=false`), API routes fall back to existing in-memory/redis store.
 
 You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
 

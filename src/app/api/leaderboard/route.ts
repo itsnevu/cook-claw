@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getLeaderboard, getRecentRoasts, type LeaderboardPeriod } from "@/lib/roast-store";
+import { getLeaderboardFromDb, getRecentRoastsFromDb } from "@/lib/roast-db";
 
 function parsePeriod(value: string | null): LeaderboardPeriod {
     if (value === "daily" || value === "weekly" || value === "all") {
@@ -19,10 +20,15 @@ export async function GET(req: Request) {
     const minAttempts = Number.isFinite(minAttemptsParam) ? Math.min(Math.max(minAttemptsParam, 1), 20) : 1;
     const recent = Number.isFinite(recentParam) ? Math.min(Math.max(recentParam, 1), 50) : 10;
 
+    const [dbLeaderboard, dbRecent] = await Promise.all([
+        getLeaderboardFromDb(limit, minAttempts, period),
+        getRecentRoastsFromDb(recent),
+    ]);
+
     return NextResponse.json({
         period,
         minAttempts,
-        leaderboard: await getLeaderboard(limit, minAttempts, period),
-        recentRoasts: await getRecentRoasts(recent),
+        leaderboard: dbLeaderboard ?? await getLeaderboard(limit, minAttempts, period),
+        recentRoasts: dbRecent ?? await getRecentRoasts(recent),
     });
 }

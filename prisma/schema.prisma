@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(cuid())
+  username    String       @unique
+  fid         Int?         @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  roastEvents RoastEvent[]
+}
+
+model RoastEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  username  String
+  profile   String
+  score     Int
+  roast     String
+  source    String   @default("api")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([username, createdAt])
+  @@index([createdAt])
+}

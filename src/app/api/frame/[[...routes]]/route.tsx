@@ -9,6 +9,7 @@ import { addRoastEvent } from "@/lib/roast-store";
 import { moderateRoastText } from "@/lib/moderation";
 import { captureServerEvent } from "@/lib/telemetry";
 import { captureServerException } from "@/lib/sentry";
+import { persistRoastEventToDb } from "@/lib/roast-db";
 
 const app = new Frog({
     basePath: "/api/frame",
@@ -149,12 +150,21 @@ app.frame("/roast", async (c) => {
             });
         }
 
-        await addRoastEvent({
+        const persisted = await persistRoastEventToDb({
             username,
             profile: result.profile,
             roast: result.roast,
             score: result.score,
+            source: "frame",
         });
+        if (!persisted) {
+            await addRoastEvent({
+                username,
+                profile: result.profile,
+                roast: result.roast,
+                score: result.score,
+            });
+        }
         await captureServerEvent("frame_roast_success", distinctId, {
             username,
             profile: result.profile,

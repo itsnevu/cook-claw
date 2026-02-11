@@ -3,6 +3,7 @@ import { getRoastEngineMetrics } from "@/lib/roast-engine";
 import { getRateLimitMetrics } from "@/lib/rate-limit";
 import { getRoastAggregateMetrics } from "@/lib/roast-store";
 import { appendMetricsSnapshot, getMetricsHistory } from "@/lib/metrics-store";
+import { getRoastAggregateFromDb } from "@/lib/roast-db";
 
 function isAuthorized(req: Request): boolean {
     const expected = process.env.METRICS_API_TOKEN;
@@ -38,10 +39,14 @@ export async function GET(req: Request) {
     const sinceTs = parseDateParam(url.searchParams.get("since"));
     const untilTs = parseDateParam(url.searchParams.get("until"));
 
-    const [allTime, daily] = await Promise.all([
+    const [dbAllTime, dbDaily, memAllTime, memDaily] = await Promise.all([
+        getRoastAggregateFromDb("all"),
+        getRoastAggregateFromDb("daily"),
         getRoastAggregateMetrics("all"),
         getRoastAggregateMetrics("daily"),
     ]);
+    const allTime = dbAllTime ?? memAllTime;
+    const daily = dbDaily ?? memDaily;
 
     const roastEngine = getRoastEngineMetrics();
     const rateLimit = getRateLimitMetrics();

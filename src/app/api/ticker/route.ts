@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getRoastAggregateMetrics } from "@/lib/roast-store";
 import { captureServerEvent } from "@/lib/telemetry";
 import { captureServerException } from "@/lib/sentry";
+import { getRoastAggregateFromDb } from "@/lib/roast-db";
 
 const GECKO_BASE = "https://api.coingecko.com/api/v3";
 const VS_CURRENCY = "usd";
@@ -96,12 +97,14 @@ async function fetchClawDexFallback(): Promise<{ claw: number | null; fdv: numbe
 
 export async function GET() {
     try {
-        const [{ btc, eth }, clawMarket, clawDexFallback, allTime] = await Promise.all([
+        const [{ btc, eth }, clawMarket, clawDexFallback, dbAllTime, memAllTime] = await Promise.all([
             fetchSimplePrices(),
             fetchClawMarketData(),
             fetchClawDexFallback(),
+            getRoastAggregateFromDb("all"),
             getRoastAggregateMetrics("all"),
         ]);
+        const allTime = dbAllTime ?? memAllTime;
 
         const claw = clawMarket.claw ?? clawDexFallback.claw;
         const fdv = clawMarket.fdv ?? clawDexFallback.fdv;

@@ -28,6 +28,10 @@ export interface RoastAggregateMetrics {
     profileBreakdown: Record<RoastProfile, number>;
 }
 
+export interface AddRoastEventInput extends Omit<RoastEvent, "id" | "createdAt"> {
+    createdAt?: string;
+}
+
 interface RoastStoreState {
     events: RoastEvent[];
 }
@@ -75,10 +79,10 @@ async function redisPipeline(commands: Array<Array<string>>): Promise<unknown[]>
     return payload.map((item) => item.result);
 }
 
-export async function addRoastEvent(input: Omit<RoastEvent, "id" | "createdAt">): Promise<RoastEvent> {
+export async function addRoastEvent(input: AddRoastEventInput): Promise<RoastEvent> {
     const event: RoastEvent = {
         id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
+        createdAt: input.createdAt ?? new Date().toISOString(),
         ...input,
     };
 
