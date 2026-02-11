@@ -43,7 +43,7 @@ export function ScrollToTop() {
                 visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
             ].join(" ")}
         >
-            <span className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/35 to-secondary/20" />
+            <span className="absolute inset-0 rounded-full bg-linear-to-br from-primary/35 to-secondary/20" />
             <svg
                 viewBox="0 0 48 48"
                 className="absolute inset-0 h-full w-full -rotate-90"
@@ -87,3 +87,4 @@ export function ScrollToTop() {
         </button>
     );
 }
+

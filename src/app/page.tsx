@@ -300,11 +300,13 @@ export default function Home() {
     const [liveNotices, setLiveNotices] = useState<LiveNotice[]>([]);
     const [noticeHistory, setNoticeHistory] = useState<LiveNotice[]>([]);
     const [noticeFilter, setNoticeFilter] = useState<NoticeCategory | "all">("all");
+    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [lastSyncAt, setLastSyncAt] = useState<string>(() => new Date().toISOString());
     const pulseResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const leaderboardTopRef = useRef<string>(leaderboardPreview[0]?.username ?? "");
     const prevRealTickerRef = useRef<TickerData | null>(null);
     const seenRoastIdsRef = useRef<Set<string>>(new Set());
+    const notificationsEnabledRef = useRef(true);
 
     const pushNotice = (
         title: string,
@@ -320,9 +322,48 @@ export default function Home() {
             category,
             createdAt: Date.now(),
         };
-        setLiveNotices((prev) => [notice, ...prev].slice(0, 4));
         setNoticeHistory((prev) => [notice, ...prev].slice(0, HISTORY_LIMIT));
+        if (notificationsEnabledRef.current) {
+            setLiveNotices((prev) => [notice, ...prev].slice(0, 4));
+        }
     };
+
+    useEffect(() => {
+        const syncFromStorage = () => {
+            try {
+                const raw = window.localStorage.getItem("clawcook.notifications.enabled");
+                if (raw !== null) {
+                    setNotificationsEnabled(raw === "1");
+                }
+            } catch {
+                // Ignore storage access errors.
+            }
+        };
+
+        const handleToggle = (event: Event) => {
+            const custom = event as CustomEvent<{ enabled?: boolean }>;
+            if (typeof custom.detail?.enabled === "boolean") {
+                setNotificationsEnabled(custom.detail.enabled);
+                return;
+            }
+            syncFromStorage();
+        };
+
+        syncFromStorage();
+        window.addEventListener("clawcook:notifications-toggle", handleToggle as EventListener);
+        window.addEventListener("storage", syncFromStorage);
+        return () => {
+            window.removeEventListener("clawcook:notifications-toggle", handleToggle as EventListener);
+            window.removeEventListener("storage", syncFromStorage);
+        };
+    }, []);
+
+    useEffect(() => {
+        notificationsEnabledRef.current = notificationsEnabled;
+        if (!notificationsEnabled) {
+            setLiveNotices([]);
+        }
+    }, [notificationsEnabled]);
 
     const dismissNotice = (id: string) => {
         setLiveNotices((prev) => prev.filter((item) => item.id !== id));
@@ -878,7 +919,7 @@ export default function Home() {
                         {statCards.map((item) => (
                             <div
                                 key={item.label}
-                                className={`rounded-2xl border bg-white/[0.04] px-3 py-3.5 transition-all duration-300 sm:px-4 sm:py-4 ${
+                                className={`rounded-2xl border bg-white/4 px-3 py-3.5 transition-all duration-300 sm:px-4 sm:py-4 ${
                                     metricPulse[item.key] === "up"
                                         ? "border-primary/45 shadow-[0_0_18px_rgba(255,69,0,0.2)]"
                                         : metricPulse[item.key] === "down"
@@ -938,15 +979,15 @@ export default function Home() {
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">How It Works</p>
                         <h3 className="mt-2 text-2xl font-bold text-white font-roxaine">Simple 3-Step Roast Loop</h3>
                         <div className="mt-4 space-y-3">
-                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-primary">Step 1</p>
                                 <p className="mt-1 text-sm text-neutral-200">Input Farcaster handle and run roast protocol.</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-primary">Step 2</p>
                                 <p className="mt-1 text-sm text-neutral-200">Engine reads profile pattern and computes score.</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-primary">Step 3</p>
                                 <p className="mt-1 text-sm text-neutral-200">Get roast output, aura score, and $CLAW loop context.</p>
                             </div>
@@ -957,19 +998,19 @@ export default function Home() {
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">What You Get</p>
                         <h3 className="mt-2 text-2xl font-bold text-white font-roxaine">Clear System Overview</h3>
                         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Roast Engine</p>
                                 <p className="mt-1 text-sm text-neutral-200">Real-time generated roast per handle.</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Score Layer</p>
                                 <p className="mt-1 text-sm text-neutral-200">Quick social aura score from profile signals.</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Live Metrics</p>
                                 <p className="mt-1 text-sm text-neutral-200">BTC, ETH, FDV, user, and roast activity snapshot.</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Protocol UX</p>
                                 <p className="mt-1 text-sm text-neutral-200">One-screen flow, faster onboarding, cleaner interaction.</p>
                             </div>
@@ -989,7 +1030,7 @@ export default function Home() {
                         </div>
                         <div className="mt-4 space-y-3">
                             {leaderboardPreview.length > 0 ? leaderboardPreview.map((entry, index) => (
-                                <div key={entry.username} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                                <div key={entry.username} className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                     <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Rank #{index + 1}</p>
                                     <div className="mt-1 flex items-center justify-between">
                                         <p className="text-sm text-neutral-200">@{entry.username}</p>
@@ -998,7 +1039,7 @@ export default function Home() {
                                     <p className="mt-1 text-xs text-neutral-500">Best {entry.bestScore} | {entry.attempts} runs</p>
                                 </div>
                             )) : (
-                                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-400">
+                                <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-neutral-400">
                                     No leaderboard data yet. Run a few roasts to populate rankings.
                                 </div>
                             )}
@@ -1009,7 +1050,7 @@ export default function Home() {
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Live Roast Feed</p>
                         <div className="mt-4 space-y-3">
                             {recentFeed.length > 0 ? recentFeed.map((event) => (
-                                <div key={event.id} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                                <div key={event.id} className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                     <div className="flex items-center justify-between">
                                         <p className="text-sm text-neutral-200">@{maskUsername(event.username)}</p>
                                         <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">{formatFeedTime(event.createdAt)}</p>
@@ -1018,7 +1059,7 @@ export default function Home() {
                                     <p className="mt-1 text-sm italic text-neutral-300 line-clamp-2">&ldquo;{event.roast}&rdquo;</p>
                                 </div>
                             )) : (
-                                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-400">
+                                <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-neutral-400">
                                     No roast activity yet. Trigger the first roast from the console above.
                                 </div>
                             )}
@@ -1039,7 +1080,7 @@ export default function Home() {
                         {txStream.map((tx) => (
                             <div
                                 key={tx.id}
-                                className="grid grid-cols-[1.3fr_1fr_auto] items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 sm:grid-cols-[1.2fr_1fr_0.8fr_0.8fr_auto] sm:px-4"
+                                className="grid grid-cols-[1.3fr_1fr_auto] items-center gap-3 rounded-xl border border-white/10 bg-white/3 px-3 py-2.5 sm:grid-cols-[1.2fr_1fr_0.8fr_0.8fr_auto] sm:px-4"
                             >
                                 <div>
                                     <p className="text-xs font-mono uppercase tracking-widest text-neutral-400">{tx.hash}</p>
@@ -1080,7 +1121,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                         {filteredNoticeHistory.slice(0, 10).map((notice) => (
-                            <div key={notice.id} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5">
+                            <div key={notice.id} className="rounded-xl border border-white/10 bg-white/3 px-4 py-2.5">
                                 <div className="flex items-center justify-between gap-3">
                                     <p className="text-sm font-semibold text-neutral-100">{notice.title}</p>
                                     <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500">
@@ -1091,7 +1132,7 @@ export default function Home() {
                             </div>
                         ))}
                         {filteredNoticeHistory.length === 0 && (
-                            <p className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-400">
+                            <p className="rounded-xl border border-white/10 bg-white/3 px-4 py-3 text-sm text-neutral-400">
                                 No alerts yet in this category.
                             </p>
                         )}
@@ -1099,7 +1140,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <div className="pointer-events-none fixed right-4 top-24 z-[70] flex w-[min(92vw,24rem)] flex-col gap-2 sm:right-6 sm:top-28">
+            <div className="pointer-events-none fixed right-4 top-24 z-70 flex w-[min(92vw,24rem)] flex-col gap-2 sm:right-6 sm:top-28">
                 <AnimatePresence initial={false}>
                     {liveNotices.map((notice) => (
                         <motion.div
@@ -1138,3 +1179,4 @@ export default function Home() {
         </main >
     );
 }
+

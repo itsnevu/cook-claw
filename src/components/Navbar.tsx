@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,6 +16,30 @@ const NAV_LINKS = [
 ];
 
 export function Navbar({ pageLabel }: { pageLabel?: string }) {
+    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+    useEffect(() => {
+        try {
+            const raw = window.localStorage.getItem("clawcook.notifications.enabled");
+            if (raw !== null) {
+                setNotificationsEnabled(raw === "1");
+            }
+        } catch {
+            // Ignore storage access errors.
+        }
+    }, []);
+
+    const handleToggleNotifications = () => {
+        const next = !notificationsEnabled;
+        setNotificationsEnabled(next);
+        try {
+            window.localStorage.setItem("clawcook.notifications.enabled", next ? "1" : "0");
+        } catch {
+            // Ignore storage write errors.
+        }
+        window.dispatchEvent(new CustomEvent("clawcook:notifications-toggle", { detail: { enabled: next } }));
+    };
+
     return (
         <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur">
             <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 sm:px-12">
@@ -38,16 +65,52 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
                         </span>
                     ) : null}
                 </div>
-                <nav className="hidden items-center gap-5 text-xs font-mono uppercase tracking-widest text-neutral-400 lg:flex">
-                    {NAV_LINKS.map((item) => (
-                        <Link key={item.href} href={item.href} className="transition-colors hover:text-primary">
-                            {item.label}
-                        </Link>
-                    ))}
-                    <a href="https://base.org" target="_blank" rel="noreferrer" className="transition-colors hover:text-primary">
-                        System: Online
-                    </a>
-                </nav>
+                <div className="flex items-center gap-3">
+                    <nav className="hidden items-center gap-5 text-xs font-mono uppercase tracking-widest text-neutral-400 lg:flex">
+                        {NAV_LINKS.map((item) => (
+                            <Link key={item.href} href={item.href} className="transition-colors hover:text-primary">
+                                {item.label}
+                            </Link>
+                        ))}
+                        <a href="https://base.org" target="_blank" rel="noreferrer" className="transition-colors hover:text-primary">
+                            System: Online
+                        </a>
+                    </nav>
+
+                    <button
+                        type="button"
+                        onClick={handleToggleNotifications}
+                        aria-label={notificationsEnabled ? "Disable notifications" : "Enable notifications"}
+                        className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/50 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-neutral-300 transition-colors hover:border-primary/40 hover:text-primary"
+                    >
+                        <svg width="34" height="20" viewBox="0 0 34 20" aria-hidden="true" className="shrink-0">
+                            <rect
+                                x="1"
+                                y="1"
+                                width="32"
+                                height="18"
+                                rx="9"
+                                fill={notificationsEnabled ? "hsla(16, 100%, 50%, 0.25)" : "rgba(255,255,255,0.08)"}
+                                stroke={notificationsEnabled ? "hsl(16, 100%, 50%)" : "rgba(255,255,255,0.3)"}
+                                strokeWidth="1"
+                            />
+                            <g
+                                style={{
+                                    transform: `translateX(${notificationsEnabled ? 14 : 0}px)`,
+                                    transition: "transform 180ms ease",
+                                }}
+                            >
+                                <circle
+                                    cx="10"
+                                    cy="10"
+                                    r="6"
+                                    fill={notificationsEnabled ? "hsl(16, 100%, 50%)" : "rgb(212,212,212)"}
+                                />
+                            </g>
+                        </svg>
+                        <span className="hidden sm:inline">{notificationsEnabled ? "Notif On" : "Notif Off"}</span>
+                    </button>
+                </div>
             </div>
         </header>
     );
