@@ -5,6 +5,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { addRoastEvent } from "@/lib/roast-store";
 import { moderateRoastText } from "@/lib/moderation";
 import { captureServerEvent } from "@/lib/telemetry";
+import { captureServerException } from "@/lib/sentry";
 
 export async function POST(req: Request) {
     try {
@@ -62,6 +63,7 @@ export async function POST(req: Request) {
         return NextResponse.json(result);
     } catch (error) {
         const message = error instanceof Error ? error.message : "Failed to generate roast.";
+        await captureServerException(error, { route: "/api/roast" });
         await captureServerEvent("roast_error", "anonymous", {
             message,
         });

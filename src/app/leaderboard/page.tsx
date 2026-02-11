@@ -59,6 +59,7 @@ export default function LeaderboardPage() {
                         <Link href="/faq" className="transition-colors hover:text-primary">FAQ</Link>
                         <Link href="/contact" className="transition-colors hover:text-primary">Contact</Link>
                         <Link href="/metrics" className="transition-colors hover:text-primary">Metrics</Link>
+                        <Link href="/analytics" className="transition-colors hover:text-primary">Analytics</Link>
                         <Link href="/" className="transition-colors hover:text-primary">Back to Roast</Link>
                     </div>
                 </nav>

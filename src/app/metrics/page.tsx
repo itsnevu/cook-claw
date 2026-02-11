@@ -235,6 +235,7 @@ export default function MetricsPage() {
                         <Link href="/about" className="transition-colors hover:text-primary">About</Link>
                         <Link href="/docs" className="transition-colors hover:text-primary">Docs</Link>
                         <Link href="/leaderboard" className="transition-colors hover:text-primary">Leaderboard</Link>
+                        <Link href="/analytics" className="transition-colors hover:text-primary">Analytics</Link>
                         <Link href="/" className="transition-colors hover:text-primary">Back to Roast</Link>
                     </div>
                 </nav>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getRoastAggregateMetrics } from "@/lib/roast-store";
 import { captureServerEvent } from "@/lib/telemetry";
+import { captureServerException } from "@/lib/sentry";
 
 const GECKO_BASE = "https://api.coingecko.com/api/v3";
 const VS_CURRENCY = "usd";
@@ -94,33 +95,49 @@ async function fetchClawDexFallback(): Promise<{ claw: number | null; fdv: numbe
 }
 
 export async function GET() {
-    const [{ btc, eth }, clawMarket, clawDexFallback, allTime] = await Promise.all([
-        fetchSimplePrices(),
-        fetchClawMarketData(),
-        fetchClawDexFallback(),
-        getRoastAggregateMetrics("all"),
-    ]);
+    try {
+        const [{ btc, eth }, clawMarket, clawDexFallback, allTime] = await Promise.all([
+            fetchSimplePrices(),
+            fetchClawMarketData(),
+            fetchClawDexFallback(),
+            getRoastAggregateMetrics("all"),
+        ]);
 
-    const claw = clawMarket.claw ?? clawDexFallback.claw;
-    const fdv = clawMarket.fdv ?? clawDexFallback.fdv;
-    const usedDexFallback = clawMarket.claw === null && clawDexFallback.claw !== null;
+        const claw = clawMarket.claw ?? clawDexFallback.claw;
+        const fdv = clawMarket.fdv ?? clawDexFallback.fdv;
+        const usedDexFallback = clawMarket.claw === null && clawDexFallback.claw !== null;
 
-    if (usedDexFallback) {
-        await captureServerEvent("ticker_claw_dex_fallback_used", "system:ticker", {
-            clawPrice: claw,
+        if (usedDexFallback) {
+            await captureServerEvent("ticker_claw_dex_fallback_used", "system:ticker", {
+                clawPrice: claw,
+                fdv,
+            });
+        }
+
+        const payload: TickerResponse = {
+            btc,
+            eth,
+            claw,
             fdv,
-        });
+            users: allTime.uniqueUsers,
+            roasts: allTime.totalRoasts,
+            updatedAt: new Date().toISOString(),
+        };
+
+        return NextResponse.json(payload);
+    } catch (error) {
+        await captureServerException(error, { route: "/api/ticker" });
+        return NextResponse.json(
+            {
+                btc: null,
+                eth: null,
+                claw: null,
+                fdv: null,
+                users: 0,
+                roasts: 0,
+                updatedAt: new Date().toISOString(),
+            } satisfies TickerResponse,
+            { status: 200 }
+        );
     }
-
-    const payload: TickerResponse = {
-        btc,
-        eth,
-        claw,
-        fdv,
-        users: allTime.uniqueUsers,
-        roasts: allTime.totalRoasts,
-        updatedAt: new Date().toISOString(),
-    };
-
-    return NextResponse.json(payload);
 }

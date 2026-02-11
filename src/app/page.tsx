@@ -6,6 +6,8 @@ import { ClawMachine } from "@/components/ClawMachine";
 import type { RoastResult } from "@/lib/roast-engine";
 import Image from "next/image";
 import Link from "next/link";
+import { captureClientEvent } from "@/lib/posthog-client";
+import { captureClientException } from "@/lib/sentry";
 
 interface TickerData {
     btc: number | null;
@@ -82,9 +84,16 @@ export default function Home() {
         };
     }, []);
 
+    useEffect(() => {
+        void captureClientEvent("home_viewed");
+    }, []);
+
     const handleRoast = async () => {
         const normalizedUsername = username.trim().replace(/^@/, "");
         if (!normalizedUsername) return;
+        void captureClientEvent("roast_initiated", {
+            username_length: normalizedUsername.length,
+        });
 
         setLoading(true);
         setResult(null);
@@ -105,9 +114,15 @@ export default function Home() {
             }
 
             setResult(data);
+            void captureClientEvent("roast_success", {
+                profile: data.profile,
+                score: data.score,
+            });
         } catch (requestError) {
             const message = requestError instanceof Error ? requestError.message : "Roast request failed.";
             setError(message);
+            void captureClientEvent("roast_error", { message });
+            void captureClientException(requestError, { route: "/", source: "handleRoast" });
         }
 
         setLoading(false);
@@ -120,7 +135,6 @@ export default function Home() {
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-150 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
 
-            {/* Header */}
             <div className="z-30 absolute top-8 left-0 right-0 flex justify-between px-8 sm:px-16 font-mono text-xs sm:text-sm text-neutral-500 uppercase tracking-widest">
                 <span className="flex items-center gap-2">
                     <Image
@@ -150,6 +164,9 @@ export default function Home() {
                     </Link>
                     <Link href="/metrics" className="hover:text-primary transition-colors">
                         Metrics
+                    </Link>
+                    <Link href="/analytics" className="hover:text-primary transition-colors">
+                        Analytics
                     </Link>
                     <a href="https://base.org" target="_blank" className="hover:text-primary transition-colors">
                         System: Online

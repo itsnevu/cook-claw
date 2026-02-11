@@ -39,6 +39,14 @@ OPENAI_API_KEY=your_openai_api_key
 # optional: server-side product analytics
 # POSTHOG_API_KEY=phc_xxx
 # POSTHOG_HOST=https://app.posthog.com
+# optional: client-side product analytics
+# NEXT_PUBLIC_POSTHOG_API_KEY=phc_xxx
+# NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+# NEXT_PUBLIC_POSTHOG_SAMPLE_RATE=1
+# NEXT_PUBLIC_POSTHOG_EVENT_COOLDOWN_MS=5000
+# optional: sentry error monitoring
+# SENTRY_DSN=https://<key>@o0.ingest.sentry.io/<project>
+# NEXT_PUBLIC_SENTRY_DSN=https://<public-key>@o0.ingest.sentry.io/<project>
 ```
 
 `NEYNAR_API_KEY` is required for fetching real Farcaster casts in `POST /api/roast`.
@@ -59,6 +67,7 @@ If `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set, roast history 
   - Optional query: `history` (2-180 samples, default 60)
   - Optional query: `since` and `until` (ISO datetime filter for history)
   - Optional query: `format=csv` (export history as CSV)
+- `/analytics` page reads protected metrics API and supports the same token via UI input.
 - `GET/POST /api/frame/[[...routes]]` -> Farcaster Frame flow wired to real roast engine.
 
 Without Redis env, leaderboard storage/rate limit fallback to process memory (runtime only).

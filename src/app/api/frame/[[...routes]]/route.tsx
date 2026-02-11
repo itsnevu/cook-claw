@@ -8,6 +8,7 @@ import { generateRoast } from "@/lib/roast-engine";
 import { addRoastEvent } from "@/lib/roast-store";
 import { moderateRoastText } from "@/lib/moderation";
 import { captureServerEvent } from "@/lib/telemetry";
+import { captureServerException } from "@/lib/sentry";
 
 const app = new Frog({
     basePath: "/api/frame",
@@ -190,6 +191,7 @@ app.frame("/roast", async (c) => {
         });
     } catch (error) {
         const message = error instanceof Error ? error.message : "Failed to roast profile.";
+        await captureServerException(error, { route: "/api/frame/roast" });
         await captureServerEvent("frame_roast_error", "anonymous", { message });
         return c.res({
             image: (
