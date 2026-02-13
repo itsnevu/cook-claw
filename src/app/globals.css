@@ -1,35 +1,19 @@
 @import "tailwindcss";
 
-@font-face {
-    font-family: "Roxaine Serif";
-    src: url("/fonts/RoxaineSerif_PERSONAL_USE_ONLY.otf") format("opentype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Roxaine Serif";
-    src: url("/fonts/RoxaineSerifItalic_PERSONAL_USE_ONLY.otf") format("opentype");
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
-}
-
 @layer base {
     :root {
-        /* SnarkClaw Dark Theme Variables (HSL) */
+        /* X402 Dark Theme Variables (HSL) */
         --background: 0 0% 5%;
         /* #0D0D0D */
         --foreground: 0 0% 95%;
         /* #F2F2F2 */
 
-        --primary: 16 100% 50%;
-        /* #FF4500 */
+        --primary: 188 84% 53%;
+        /* #22D3EE */
         --primary-foreground: 0 0% 100%;
 
-        --secondary: 21 100% 45%;
-        /* #E65100 */
+        --secondary: 24 95% 56%;
+        /* #FB923C */
         --secondary-foreground: 0 0% 100%;
 
         --accent: 0 0% 10%;
@@ -53,7 +37,6 @@
 @theme {
     --font-sans: var(--font-jakarta);
     --font-mono: var(--font-jetbrains-mono);
-    --font-roxaine: "Roxaine Serif", serif;
 
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
@@ -93,7 +76,7 @@
     }
 
     .glow-text {
-        text-shadow: 0 0 20px rgba(255, 69, 0, 0.5);
+        text-shadow: 0 0 20px rgba(34, 211, 238, 0.45);
     }
 
     .grid-bg {

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { GlobalBackground } from "@/components/GlobalBackground";
 
 const jakarta = Plus_Jakarta_Sans({
     subsets: ["latin"],
@@ -40,7 +41,10 @@ export default function RootLayout({
                     "bg-background text-foreground min-h-screen antialiased selection:bg-primary selection:text-primary-foreground font-sans"
                 )}
             >
-                <div className="flex min-h-screen flex-col">
+                <div className="pointer-events-none fixed inset-0 z-0">
+                    <GlobalBackground />
+                </div>
+                <div className="relative z-10 flex min-h-screen flex-col">
                     <Navbar />
                     <div className="flex-1">{children}</div>
                     <Footer />

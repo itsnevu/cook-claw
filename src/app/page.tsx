@@ -843,7 +843,7 @@ export default function Home() {
     const displayNoticeHistory = filteredNoticeHistory.length > 0 ? filteredNoticeHistory : fallbackNoticesRef.current;
 
     return (
-        <main className="relative min-h-screen flex flex-col items-center p-6 pb-16 pt-28 sm:px-16 sm:pt-32 overflow-hidden bg-background">
+        <main className="relative min-h-screen flex flex-col items-center p-6 pb-16 pt-28 sm:px-16 sm:pt-32 overflow-hidden bg-black/55">
 
             {/* Background Effects */}
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
@@ -853,7 +853,7 @@ export default function Home() {
                 <p className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
                     X402 x ERC-8004
                 </p>
-                <h1 className="mt-5 text-4xl leading-tight font-bold tracking-tight text-white sm:text-6xl font-roxaine">
+                <h1 className="mt-5 text-4xl leading-tight font-bold tracking-tight text-white sm:text-6xl">
                     Correlation console for narrative-grade onchain identity.
                 </h1>
                 <p className="mx-auto mt-5 max-w-2xl text-sm text-neutral-300 sm:text-base">
@@ -888,8 +888,8 @@ export default function Home() {
                 {/* Controls Section */}
                 <div className="flex-1 w-full max-w-sm flex flex-col gap-6">
                     <div className="text-center md:text-left space-y-2">
-                        <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white glow-text font-roxaine">
-                            X402<span className="text-primary">.CORE</span>
+                        <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white glow-text">
+                            X402<span className="text-secondary">.CORE</span>
                         </h2>
                         <p className="text-neutral-400 text-sm sm:text-base font-mono">
                             Insert handle. Correlate signals. Sync ERC-8004.
@@ -1088,7 +1088,7 @@ export default function Home() {
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className={PANEL_SHELL_CLASS}>
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Flow Design</p>
-                        <h3 className="mt-2 text-2xl font-bold text-white font-roxaine">Three-Step Correlation Loop</h3>
+                        <h3 className="mt-2 text-2xl font-bold text-white">Three-Step Correlation Loop</h3>
                         <div className="mt-4 space-y-3">
                             <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-primary">Step 1</p>
@@ -1107,7 +1107,7 @@ export default function Home() {
 
                     <div className={PANEL_SHELL_CLASS}>
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">System Output</p>
-                        <h3 className="mt-2 text-2xl font-bold text-white font-roxaine">Protocol Visibility Layer</h3>
+                        <h3 className="mt-2 text-2xl font-bold text-white">Protocol Visibility Layer</h3>
                         <div className="mt-4 grid gap-3 sm:grid-cols-2">
                             <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                 <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Narrative Engine</p>
@@ -1277,5 +1277,6 @@ export default function Home() {
         </main >
     );
 }
+
 
 

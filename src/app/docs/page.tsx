@@ -22,7 +22,7 @@ const sections = [
 
 export default function DocsPage() {
     return (
-        <main className="relative min-h-screen overflow-hidden bg-background px-6 pb-16 pt-28 sm:px-16 sm:pt-32">
+        <main className="relative min-h-screen overflow-hidden bg-black/55 px-6 pb-16 pt-28 sm:px-16 sm:pt-32">
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[560px] w-[560px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
 
@@ -59,3 +59,4 @@ export default function DocsPage() {
         </main>
     );
 }
+

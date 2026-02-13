@@ -12,7 +12,7 @@ const DROP_DURATION = 0.62;
 export function ClawMachine({ isGrabbing }: ClawMachineProps) {
     return (
         <div className="relative h-64 w-full overflow-hidden rounded-2xl border border-cyan-400/20 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.16),transparent_45%),radial-gradient(circle_at_80%_15%,rgba(249,115,22,0.2),transparent_42%),linear-gradient(160deg,#030712,#0f172a_55%,#111827)] sm:h-80 sm:w-80">
-            <div className="pointer-events-none absolute inset-0 opacity-30 [background-size:16px_16px] [background-image:linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.12)_1px,transparent_1px)]" />
+            <div className="pointer-events-none absolute inset-0 opacity-30 bg-size-[16px_16px] bg-[linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.12)_1px,transparent_1px)]" />
             <div className="absolute left-1/2 top-2 h-2 w-44 -translate-x-1/2 rounded-full bg-cyan-200/20" />
 
             <motion.div
@@ -21,7 +21,7 @@ export function ClawMachine({ isGrabbing }: ClawMachineProps) {
                 transition={isGrabbing ? { duration: 0.2 } : { duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
             >
                 <motion.div
-                    className="mx-auto w-[2px] bg-gradient-to-b from-cyan-300/80 via-cyan-200/45 to-cyan-100/20"
+                    className="mx-auto w-0.5 bg-linear-to-b from-cyan-300/80 via-cyan-200/45 to-cyan-100/20"
                     animate={{ height: isGrabbing ? 166 : 52 }}
                     transition={{ duration: isGrabbing ? DROP_DURATION : 0.22, ease: isGrabbing ? "easeIn" : "easeOut" }}
                 />
@@ -31,8 +31,8 @@ export function ClawMachine({ isGrabbing }: ClawMachineProps) {
                     animate={{ y: isGrabbing ? 166 : 52 }}
                     transition={{ duration: isGrabbing ? DROP_DURATION : 0.22, ease: isGrabbing ? "easeIn" : "easeOut" }}
                 >
-                    <div className="relative h-[68px] w-[180px] overflow-hidden rounded-xl border border-cyan-200/20 bg-gradient-to-br from-slate-900/95 via-slate-900 to-slate-950 shadow-[0_18px_34px_rgba(2,6,23,0.7)]">
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-100/10 to-transparent" />
+                    <div className="relative h-17 w-45 overflow-hidden rounded-xl border border-cyan-200/20 bg-linear-to-br from-slate-900/95 via-slate-900 to-slate-950 shadow-[0_18px_34px_rgba(2,6,23,0.7)]">
+                        <div className="absolute inset-0 bg-linear-to-r from-transparent via-cyan-100/10 to-transparent" />
                         <div className="absolute left-3 top-2 rounded-md border border-cyan-200/20 bg-cyan-300/10 px-2 py-0.5 text-[9px] font-semibold tracking-[0.18em] text-cyan-200">
                             NARASI X402
                         </div>
