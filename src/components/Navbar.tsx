@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -16,18 +16,20 @@ const NAV_LINKS = [
 ];
 
 export function Navbar({ pageLabel }: { pageLabel?: string }) {
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-    useEffect(() => {
+    const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
+        if (typeof window === "undefined") {
+            return true;
+        }
         try {
             const raw = window.localStorage.getItem("clawcook.notifications.enabled");
             if (raw !== null) {
-                setNotificationsEnabled(raw === "1");
+                return raw === "1";
             }
         } catch {
             // Ignore storage access errors.
         }
-    }, []);
+        return true;
+    });
 
     const handleToggleNotifications = () => {
         const next = !notificationsEnabled;
@@ -47,15 +49,15 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
                     <Link href="/" className="flex items-center gap-3">
                         <Image
                             src="/clawcook-logo.png"
-                            alt="ClawCook Logo"
+                            alt="X402 Protocol Logo"
                             width={48}
                             height={48}
                             className="h-10 w-10 rounded-full object-cover"
                         />
                         <div className="text-white">
-                            <div className="text-sm font-semibold tracking-widest font-roxaine">ClawCook</div>
+                            <div className="text-sm font-semibold tracking-widest font-roxaine">X402 Console</div>
                             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-500">
-                                Roast Protocol
+                                ERC-8004 Correlator
                             </div>
                         </div>
                     </Link>

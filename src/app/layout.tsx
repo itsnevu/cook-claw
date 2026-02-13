@@ -17,8 +17,8 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "ClawCook",
-    description: 'The World’s First Agentic "Roast-to-Earn" Clawbot',
+    title: "X402 Console",
+    description: "Correlation-first protocol console aligned with ERC-8004 narrative systems.",
     icons: {
         icon: "/clawcook-favicon.png",
         shortcut: "/clawcook-favicon.png",
@@ -50,3 +50,4 @@ export default function RootLayout({
         </html>
     );
 }
+

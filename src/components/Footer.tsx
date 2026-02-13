@@ -60,21 +60,20 @@ export function Footer() {
                         <div className="flex items-center gap-3">
                             <Image
                                 src="/clawcook-logo.png"
-                                alt="ClawCook Logo"
+                                alt="X402 Protocol Logo"
                                 width={48}
                                 height={48}
                                 className="h-12 w-12 rounded-full object-cover"
                             />
                             <div>
-                                <div className="text-lg font-semibold text-white font-roxaine">ClawCook</div>
+                                <div className="text-lg font-semibold text-white font-roxaine">X402 Console</div>
                                 <div className="text-xs font-mono uppercase tracking-widest text-neutral-500">
-                                    Roast-to-earn protocol
+                                    ERC-8004 Narrative Layer
                                 </div>
                             </div>
                         </div>
                         <p className="text-sm text-neutral-300">
-                            A playful arena for onchain roasting, built for Farcaster-native communities and backed by
-                            live metrics, drop-ready integrations, and transparent status reporting.
+                            A correlation-first interface for onchain identity narratives, built for Farcaster-native communities and backed by live metrics, settlement telemetry, and transparent status reporting.
                         </p>
                         <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-widest text-neutral-500">
                             <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
@@ -119,7 +118,7 @@ export function Footer() {
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-between">
-                    <span>© 2026 ClawCook. All rights reserved.</span>
+                    <span>(c) 2026 X402 Console. All rights reserved.</span>
                     <div className="flex flex-wrap gap-4 font-mono uppercase tracking-widest text-[10px] text-neutral-500">
                         <span>Version: 0.1.0</span>
                         <span>Region: iad1</span>
@@ -130,3 +129,5 @@ export function Footer() {
         </footer>
     );
 }
+
+

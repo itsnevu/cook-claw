@@ -1,26 +1,26 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "FAQ | ClawCook",
-    description: "Frequently asked questions about ClawCook.",
+    title: "FAQ | X402 Console",
+    description: "Frequently asked questions about X402 Console and ERC-8004 flow.",
 };
 
 const faqs = [
     {
-        q: "Is ClawCook connected to Farcaster?",
-        a: "ClawCook is designed around Farcaster handles as the main identity input in the roast console.",
+        q: "Is X402 Console connected to Farcaster?",
+        a: "X402 Console is designed around Farcaster handles as the main identity input in the correlation console.",
     },
     {
         q: "What does the score represent?",
-        a: "The score summarizes persona intensity from the roast engine output, useful for gameplay loops and social sharing.",
+        a: "The score summarizes narrative signal intensity from the correlation engine output, useful for protocol loops and social sharing.",
     },
     {
-        q: "Do users need crypto to use the roast tool?",
-        a: "Basic roast interaction can be presented as a social feature, while onchain reward layers can be optional.",
+        q: "Do users need crypto to use the correlation tool?",
+        a: "Basic interaction can be presented as a social feature, while onchain reward layers remain optional.",
     },
     {
-        q: "Can projects run campaigns with ClawCook?",
-        a: "Yes. Campaigns can map scores and roast outputs into events, quests, and leaderboard-style activations.",
+        q: "Can projects run campaigns with X402 Console?",
+        a: "Yes. Campaigns can map scores and narrative outputs into events, quests, and leaderboard-style activations.",
     },
 ];
 
@@ -34,7 +34,7 @@ export default function FaqPage() {
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">FAQ</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                        Answers to common ClawCook questions.
+                        Answers to common X402 Console questions.
                     </h1>
                 </section>
 
