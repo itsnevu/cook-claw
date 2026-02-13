@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Analytics</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                        Operational KPI snapshot for ClawCook.
+                        Operational KPI snapshot for ClawCook deployment flow.
                     </h1>
                     <p className="mt-4 text-sm text-neutral-300">
                         Auto-refresh every 15 seconds. Generated at: {kpis?.generatedAt ?? "-"}
@@ -189,7 +189,7 @@ export default function AnalyticsPage() {
                             <p className="mt-2 text-3xl font-bold text-white">{kpis.blockRate}</p>
                         </article>
                         <article className="glass-panel rounded-2xl p-5">
-                            <p className="text-xs font-mono uppercase tracking-widest text-neutral-400">Daily Roasts</p>
+                            <p className="text-xs font-mono uppercase tracking-widest text-neutral-400">Daily Deploys</p>
                             <p className="mt-2 text-3xl font-bold text-white">{kpis.dailyRoasts}</p>
                         </article>
                         <article className="glass-panel rounded-2xl p-5">

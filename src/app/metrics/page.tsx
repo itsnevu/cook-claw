@@ -231,7 +231,7 @@ export default function MetricsPage() {
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Runtime Metrics</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                        Live observability for roast engine and rate limiting.
+                        Live observability for deploy engine and rate limiting.
                     </h1>
                     <p className="mt-4 text-sm text-neutral-300">
                         Auto-refresh every 10 seconds. Generated at: {data?.generatedAt ?? "-"}
@@ -304,7 +304,7 @@ export default function MetricsPage() {
                         </article>
 
                         <article className="glass-panel rounded-2xl p-6">
-                            <h2 className="text-xl font-bold text-white">Roast Engine</h2>
+                            <h2 className="text-xl font-bold text-white">Deploy Engine</h2>
                             <ul className="mt-4 space-y-2 text-sm text-neutral-300">
                                 <li>Total Requests: {data.roastEngine.totalRequests}</li>
                                 <li>AI Success: {data.roastEngine.aiSuccess}</li>
@@ -328,7 +328,7 @@ export default function MetricsPage() {
                         <article className="glass-panel rounded-2xl p-6">
                             <h2 className="text-xl font-bold text-white">Aggregate (All Time)</h2>
                             <ul className="mt-4 space-y-2 text-sm text-neutral-300">
-                                <li>Total Roasts: {data.aggregates.allTime.totalRoasts}</li>
+                                <li>Total Deploys: {data.aggregates.allTime.totalRoasts}</li>
                                 <li>Unique Users: {data.aggregates.allTime.uniqueUsers}</li>
                                 <li>Average Score: {data.aggregates.allTime.averageScore}</li>
                                 <li>Best Score: {data.aggregates.allTime.bestScore}</li>

@@ -47,37 +47,37 @@ const FALLBACK_LEADERBOARD: LeaderboardEntry[] = [
     },
 ];
 
-const FALLBACK_RECENT_ROASTS: RoastEvent[] = [
+const FALLBACK_RECENT_DEPLOYS: RoastEvent[] = [
     {
-        id: "fallback-roast-1",
+        id: "fallback-deploy-1",
         username: "degenbella",
         profile: "Reply Guy",
         score: 94,
-        roast: "Engagement maxxing detected. Chronically early, occasionally coherent.",
+        roast: "Deploy bundle broadcasted with high confidence and low latency drift.",
         createdAt: new Date(Date.now() - 5 * 60_000).toISOString(),
     },
     {
-        id: "fallback-roast-2",
+        id: "fallback-deploy-2",
         username: "basewizard",
         profile: "Larping Dev",
         score: 89,
-        roast: "Ship thread every day, ship code every full moon.",
+        roast: "Module compiled and finalized with stable gas profile.",
         createdAt: new Date(Date.now() - 11 * 60_000).toISOString(),
     },
     {
-        id: "fallback-roast-3",
+        id: "fallback-deploy-3",
         username: "gmfarcaster",
         profile: "Vibes-only Trader",
         score: 91,
-        roast: "Portfolio built on conviction, caffeine, and zero stop-loss discipline.",
+        roast: "Operator synchronized deployment state across settlement nodes.",
         createdAt: new Date(Date.now() - 17 * 60_000).toISOString(),
     },
     {
-        id: "fallback-roast-4",
+        id: "fallback-deploy-4",
         username: "alphaframe",
         profile: "Reply Guy",
         score: 86,
-        roast: "High signal in bio, high noise in replies, somehow still bullish.",
+        roast: "Runtime telemetry published with clean module score output.",
         createdAt: new Date(Date.now() - 25 * 60_000).toISOString(),
     },
 ];
@@ -115,7 +115,7 @@ export default function LeaderboardPage() {
     }, [period, minAttempts]);
 
     const displayLeaderboard = data?.leaderboard.length ? data.leaderboard : FALLBACK_LEADERBOARD;
-    const displayRecentRoasts = data?.recentRoasts.length ? data.recentRoasts : FALLBACK_RECENT_ROASTS;
+    const displayRecentDeploys = data?.recentRoasts.length ? data.recentRoasts : FALLBACK_RECENT_DEPLOYS;
 
     return (
         <main className="relative min-h-screen overflow-hidden bg-black/55 px-6 pb-16 pt-28 sm:px-16 sm:pt-32">
@@ -126,7 +126,7 @@ export default function LeaderboardPage() {
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Leaderboard</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                        Top roasted handles by average score.
+                        Top deploy operators by average score.
                     </h1>
                     <p className="mt-4 text-sm text-neutral-300">
                         Data is shared when Redis is configured. Otherwise this view shows runtime memory only.
@@ -200,9 +200,9 @@ export default function LeaderboardPage() {
                         </div>
 
                         <div className="glass-panel rounded-2xl p-6">
-                            <h2 className="text-xl font-bold text-white">Recent Roasts</h2>
+                            <h2 className="text-xl font-bold text-white">Recent Deploys</h2>
                             <ul className="mt-4 space-y-3 text-sm">
-                                {displayRecentRoasts.map((event) => (
+                                {displayRecentDeploys.map((event) => (
                                     <li key={event.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
                                         <p className="font-mono text-neutral-200">
                                             @{event.username} <span className="text-primary">({event.score})</span>

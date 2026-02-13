@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const PRIVACY = [
     {
         title: "Data We Handle",
-        body: "We process the information you submit for roasting, along with aggregated usage metrics to improve performance and stability.",
+        body: "We process the information you submit for deployment simulation, along with aggregated usage metrics to improve performance and stability.",
     },
     {
         title: "Analytics",

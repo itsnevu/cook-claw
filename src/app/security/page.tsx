@@ -35,7 +35,7 @@ export default function SecurityPage() {
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">
                     <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Security</p>
                     <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                        Security practices that keep the roast engine resilient.
+                        Security practices that keep the deploy engine resilient.
                     </h1>
                     <p className="mt-5 max-w-3xl text-sm text-neutral-300 sm:text-base">
                         We focus on predictable operations, monitored services, and a responsible disclosure path. This

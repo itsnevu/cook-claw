@@ -12,7 +12,7 @@ const TERMS = [
     },
     {
         title: "Service Scope",
-        body: "ClawCook provides a roast-to-earn experience, analytics, and community-facing tools. We may update or discontinue features to keep the product safe, compliant, and fun.",
+        body: "ClawCook provides a deploy-style simulation experience, analytics, and community-facing tools. We may update or discontinue features to keep the product safe, compliant, and useful.",
     },
     {
         title: "Content and Conduct",
