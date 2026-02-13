@@ -60,13 +60,13 @@ export function Footer() {
                         <div className="flex items-center gap-3">
                             <Image
                                 src="/clawcook-logo.png"
-                                alt="X402 Protocol Logo"
+                                alt="ClawCook Logo"
                                 width={48}
                                 height={48}
                                 className="h-12 w-12 rounded-full object-cover"
                             />
                             <div>
-                                <div className="text-lg font-semibold text-white">X402 Console</div>
+                                <div className="text-lg font-semibold text-white font-roxaine">ClawCook</div>
                                 <div className="text-xs font-mono uppercase tracking-widest text-neutral-500">
                                     ERC-8004 Narrative Layer
                                 </div>
@@ -118,7 +118,7 @@ export function Footer() {
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-between">
-                    <span>(c) 2026 X402 Console. All rights reserved.</span>
+                    <span>(c) 2026 ClawCook. All rights reserved.</span>
                     <div className="flex flex-wrap gap-4 font-mono uppercase tracking-widest text-[10px] text-neutral-500">
                         <span>Version: 0.1.0</span>
                         <span>Region: iad1</span>

@@ -49,13 +49,13 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
                     <Link href="/" className="flex items-center gap-3">
                         <Image
                             src="/clawcook-logo.png"
-                            alt="X402 Protocol Logo"
+                            alt="ClawCook Logo"
                             width={48}
                             height={48}
                             className="h-10 w-10 rounded-full object-cover"
                         />
                         <div className="text-white">
-                            <div className="text-sm font-semibold tracking-widest">X402 Console</div>
+                            <div className="text-sm font-semibold tracking-widest font-roxaine">ClawCook</div>
                             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-500">
                                 ERC-8004 Correlator
                             </div>
@@ -92,8 +92,8 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
                                 width="32"
                                 height="18"
                                 rx="9"
-                                fill={notificationsEnabled ? "hsla(188, 84%, 53%, 0.25)" : "rgba(255,255,255,0.08)"}
-                                stroke={notificationsEnabled ? "hsl(188, 84%, 53%)" : "rgba(255,255,255,0.3)"}
+                                fill={notificationsEnabled ? "hsla(24, 95%, 56%, 0.25)" : "rgba(255,255,255,0.08)"}
+                                stroke={notificationsEnabled ? "hsl(24, 95%, 56%)" : "rgba(255,255,255,0.3)"}
                                 strokeWidth="1"
                             />
                             <g
@@ -106,7 +106,7 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
                                     cx="10"
                                     cy="10"
                                     r="6"
-                                    fill={notificationsEnabled ? "hsl(188, 84%, 53%)" : "rgb(212,212,212)"}
+                                    fill={notificationsEnabled ? "hsl(24, 95%, 56%)" : "rgb(212,212,212)"}
                                 />
                             </g>
                         </svg>

@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+    font-family: "Nulshock";
+    src: url("/fonts/Nulshock-Bd.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 @layer base {
     :root {
         /* X402 Dark Theme Variables (HSL) */
@@ -8,12 +16,12 @@
         --foreground: 0 0% 95%;
         /* #F2F2F2 */
 
-        --primary: 188 84% 53%;
-        /* #22D3EE */
+        --primary: 24 95% 56%;
+        /* #FB923C */
         --primary-foreground: 0 0% 100%;
 
-        --secondary: 24 95% 56%;
-        /* #FB923C */
+        --secondary: 16 100% 50%;
+        /* #FF4500 */
         --secondary-foreground: 0 0% 100%;
 
         --accent: 0 0% 10%;
@@ -37,6 +45,7 @@
 @theme {
     --font-sans: var(--font-jakarta);
     --font-mono: var(--font-jetbrains-mono);
+    --font-roxaine: "Nulshock", Georgia, "Times New Roman", serif;
 
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
@@ -76,7 +85,7 @@
     }
 
     .glow-text {
-        text-shadow: 0 0 20px rgba(34, 211, 238, 0.45);
+        text-shadow: 0 0 20px rgba(251, 146, 60, 0.45);
     }
 
     .grid-bg {

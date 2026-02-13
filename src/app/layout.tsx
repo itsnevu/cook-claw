@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalBackground } from "@/components/GlobalBackground";
+import { WalletProviders } from "@/components/WalletProviders";
 
 const jakarta = Plus_Jakarta_Sans({
     subsets: ["latin"],
@@ -17,9 +18,62 @@ const jetbrains = JetBrains_Mono({
     variable: "--font-jetbrains-mono",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://clawcook.xyz";
+const metadataBase = new URL(siteUrl);
+
 export const metadata: Metadata = {
-    title: "X402 Console",
-    description: "Correlation-first protocol console aligned with ERC-8004 narrative systems.",
+    metadataBase,
+    title: {
+        default: "ClawCook",
+        template: "%s | ClawCook",
+    },
+    description: "Deploy-ready narrative console for Farcaster handles with score output, live telemetry, and ERC-8004 aligned module context.",
+    keywords: [
+        "X402 Console",
+        "ERC-8004",
+        "Farcaster analytics",
+        "onchain identity",
+        "web3 narrative module",
+        "Base ecosystem dashboard",
+        "deployment console",
+        "crypto telemetry",
+    ],
+    alternates: {
+        canonical: "/",
+    },
+    openGraph: {
+        type: "website",
+        locale: "en_US",
+        url: "/",
+        siteName: "ClawCook",
+        title: "ClawCook",
+        description: "Deploy-ready narrative console for Farcaster handles with score output, live telemetry, and ERC-8004 aligned module context.",
+        images: [
+            {
+                url: "/clawcook-logo.png",
+                width: 1200,
+                height: 630,
+                alt: "ClawCook",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "ClawCook",
+        description: "Deploy-ready narrative console for Farcaster handles with score output, live telemetry, and ERC-8004 aligned module context.",
+        images: ["/clawcook-logo.png"],
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+        },
+    },
     icons: {
         icon: "/clawcook-favicon.png",
         shortcut: "/clawcook-favicon.png",
@@ -44,12 +98,14 @@ export default function RootLayout({
                 <div className="pointer-events-none fixed inset-0 z-0">
                     <GlobalBackground />
                 </div>
-                <div className="relative z-10 flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">{children}</div>
-                    <Footer />
-                    <ScrollToTop />
-                </div>
+                <WalletProviders>
+                    <div className="relative z-10 flex min-h-screen flex-col">
+                        <Navbar />
+                        <div className="flex-1">{children}</div>
+                        <Footer />
+                        <ScrollToTop />
+                    </div>
+                </WalletProviders>
             </body>
         </html>
     );

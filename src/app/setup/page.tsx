@@ -34,7 +34,7 @@ function stateClass(state: IntegrationState): string {
         case "disabled":
             return "text-neutral-300 border-white/20 bg-white/5";
         default:
-            return "text-sky-300 border-sky-500/40 bg-sky-500/10";
+            return "text-orange-300 border-orange-500/40 bg-orange-500/10";
     }
 }
 
