@@ -1,18 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import { CardNav, type CardNavItem } from "@/components/CardNav";
 
-const NAV_LINKS = [
-    { href: "/about", label: "About" },
-    { href: "/docs", label: "Docs" },
-    { href: "/faq", label: "FAQ" },
-    { href: "/contact", label: "Contact" },
-    { href: "/leaderboard", label: "Leaderboard" },
-    { href: "/metrics", label: "Metrics" },
-    { href: "/analytics", label: "Analytics" },
-    { href: "/setup", label: "Setup" },
+const NAV_GROUPS: CardNavItem[] = [
+    {
+        label: "Protocol",
+        bgColor: "rgba(27, 10, 2, 0.96)",
+        textColor: "#fff",
+        links: [
+            { label: "About", href: "/about", ariaLabel: "About ClawCook" },
+            { label: "Docs", href: "/docs", ariaLabel: "ClawCook docs" },
+            { label: "FAQ", href: "/faq", ariaLabel: "Frequently asked questions" },
+        ],
+    },
+    {
+        label: "Network",
+        bgColor: "rgba(36, 12, 2, 0.96)",
+        textColor: "#fff",
+        links: [
+            { label: "Leaderboard", href: "/leaderboard", ariaLabel: "Top deploy operators" },
+            { label: "Metrics", href: "/metrics", ariaLabel: "Protocol metrics" },
+            { label: "Analytics", href: "/analytics", ariaLabel: "Analytics dashboard" },
+        ],
+    },
+    {
+        label: "Support",
+        bgColor: "rgba(47, 16, 3, 0.96)",
+        textColor: "#fff",
+        links: [
+            { label: "Setup", href: "/setup", ariaLabel: "Setup guide" },
+            { label: "Contact", href: "/contact", ariaLabel: "Contact page" },
+            { label: "Terms", href: "/terms", ariaLabel: "Terms of service" },
+        ],
+    },
 ];
 
 export function Navbar({ pageLabel }: { pageLabel?: string }) {
@@ -43,77 +64,23 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur">
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 sm:px-12">
-                <div className="flex items-center gap-3">
-                    <Link href="/" className="flex items-center gap-3">
-                        <Image
-                            src="/clawcook-logo.png"
-                            alt="ClawCook Logo"
-                            width={48}
-                            height={48}
-                            className="h-10 w-10 rounded-full object-cover"
-                        />
-                        <div className="text-white">
-                            <div className="text-sm font-semibold tracking-widest font-roxaine">ClawCook</div>
-                            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-500">
-                                ERC-8004 Correlator
-                            </div>
-                        </div>
-                    </Link>
-                    {pageLabel ? (
-                        <span className="hidden text-xs font-mono uppercase tracking-widest text-neutral-500 sm:inline">
-                            {pageLabel}
-                        </span>
-                    ) : null}
+        <header className="fixed inset-x-0 top-0 z-40 py-3">
+            <CardNav
+                logoSrc="/clawcook-logo.png"
+                logoAlt="ClawCook Logo"
+                items={NAV_GROUPS}
+                baseColor="rgba(0, 0, 0, 0.86)"
+                menuColor="hsl(24 95% 56%)"
+                buttonBgColor={notificationsEnabled ? "rgba(251, 146, 60, 0.18)" : "rgba(255,255,255,0.08)"}
+                buttonTextColor={notificationsEnabled ? "hsl(24 95% 56%)" : "rgba(255,255,255,0.85)"}
+                actionLabel={notificationsEnabled ? "Notif On" : "Notif Off"}
+                onActionClick={handleToggleNotifications}
+            />
+            {pageLabel ? (
+                <div className="mx-auto mt-2 w-full max-w-6xl px-6 sm:px-12">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500">{pageLabel}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <nav className="hidden items-center gap-5 text-xs font-mono uppercase tracking-widest text-neutral-400 lg:flex">
-                        {NAV_LINKS.map((item) => (
-                            <Link key={item.href} href={item.href} className="transition-colors hover:text-primary">
-                                {item.label}
-                            </Link>
-                        ))}
-                        <a href="https://base.org" target="_blank" rel="noreferrer" className="transition-colors hover:text-primary">
-                            System: Online
-                        </a>
-                    </nav>
-
-                    <button
-                        type="button"
-                        onClick={handleToggleNotifications}
-                        aria-label={notificationsEnabled ? "Disable notifications" : "Enable notifications"}
-                        className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/50 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-neutral-300 transition-colors hover:border-primary/40 hover:text-primary"
-                    >
-                        <svg width="34" height="20" viewBox="0 0 34 20" aria-hidden="true" className="shrink-0">
-                            <rect
-                                x="1"
-                                y="1"
-                                width="32"
-                                height="18"
-                                rx="9"
-                                fill={notificationsEnabled ? "hsla(24, 95%, 56%, 0.25)" : "rgba(255,255,255,0.08)"}
-                                stroke={notificationsEnabled ? "hsl(24, 95%, 56%)" : "rgba(255,255,255,0.3)"}
-                                strokeWidth="1"
-                            />
-                            <g
-                                style={{
-                                    transform: `translateX(${notificationsEnabled ? 14 : 0}px)`,
-                                    transition: "transform 180ms ease",
-                                }}
-                            >
-                                <circle
-                                    cx="10"
-                                    cy="10"
-                                    r="6"
-                                    fill={notificationsEnabled ? "hsl(24, 95%, 56%)" : "rgb(212,212,212)"}
-                                />
-                            </g>
-                        </svg>
-                        <span className="hidden sm:inline">{notificationsEnabled ? "Notif On" : "Notif Off"}</span>
-                    </button>
-                </div>
-            </div>
+            ) : null}
         </header>
     );
 }

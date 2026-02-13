@@ -18,7 +18,7 @@ interface DeltaPoint {
 }
 
 interface MetricsResponse {
-    roastEngine: {
+    deployEngine: {
         totalRequests: number;
         aiSuccess: number;
         aiFailure: number;
@@ -34,14 +34,14 @@ interface MetricsResponse {
     };
     aggregates: {
         allTime: {
-            totalRoasts: number;
+            totalDeploys: number;
             uniqueUsers: number;
             averageScore: number;
             bestScore: number;
             profileBreakdown: Record<string, number>;
         };
         daily: {
-            totalRoasts: number;
+            totalDeploys: number;
             uniqueUsers: number;
             averageScore: number;
             bestScore: number;
@@ -306,11 +306,11 @@ export default function MetricsPage() {
                         <article className="glass-panel rounded-2xl p-6">
                             <h2 className="text-xl font-bold text-white">Deploy Engine</h2>
                             <ul className="mt-4 space-y-2 text-sm text-neutral-300">
-                                <li>Total Requests: {data.roastEngine.totalRequests}</li>
-                                <li>AI Success: {data.roastEngine.aiSuccess}</li>
-                                <li>AI Failure: {data.roastEngine.aiFailure}</li>
-                                <li>Fallback Used: {data.roastEngine.fallbackUsed}</li>
-                                <li>Last AI Error: {data.roastEngine.lastAiErrorAt ?? "-"}</li>
+                                <li>Total Requests: {data.deployEngine.totalRequests}</li>
+                                <li>AI Success: {data.deployEngine.aiSuccess}</li>
+                                <li>AI Failure: {data.deployEngine.aiFailure}</li>
+                                <li>Fallback Used: {data.deployEngine.fallbackUsed}</li>
+                                <li>Last AI Error: {data.deployEngine.lastAiErrorAt ?? "-"}</li>
                             </ul>
                         </article>
 
@@ -328,7 +328,7 @@ export default function MetricsPage() {
                         <article className="glass-panel rounded-2xl p-6">
                             <h2 className="text-xl font-bold text-white">Aggregate (All Time)</h2>
                             <ul className="mt-4 space-y-2 text-sm text-neutral-300">
-                                <li>Total Deploys: {data.aggregates.allTime.totalRoasts}</li>
+                                <li>Total Deploys: {data.aggregates.allTime.totalDeploys}</li>
                                 <li>Unique Users: {data.aggregates.allTime.uniqueUsers}</li>
                                 <li>Average Score: {data.aggregates.allTime.averageScore}</li>
                                 <li>Best Score: {data.aggregates.allTime.bestScore}</li>

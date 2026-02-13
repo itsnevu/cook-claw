@@ -4,12 +4,12 @@ import { Button, Frog, TextInput } from "frog";
 import { handle } from "frog/next";
 import { fetchRecentCastsByFid, normalizeHandle, resolveFidByUsername } from "@/lib/farcaster";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { generateRoast } from "@/lib/roast-engine";
-import { addRoastEvent } from "@/lib/roast-store";
-import { moderateRoastText } from "@/lib/moderation";
+import { generateDeploy } from "@/lib/deploy-engine";
+import { addDeployEvent } from "@/lib/deploy-store";
+import { moderateDeployText } from "@/lib/moderation";
 import { captureServerEvent } from "@/lib/telemetry";
 import { captureServerException } from "@/lib/sentry";
-import { persistRoastEventToDb } from "@/lib/roast-db";
+import { persistDeployEventToDb } from "@/lib/deploy-db";
 
 const app = new Frog({
     basePath: "/api/frame",
@@ -18,7 +18,7 @@ const app = new Frog({
 
 app.frame("/", (c) => {
     return c.res({
-        action: "/roast",
+        action: "/deploy",
         image: (
             <div
                 style={{
@@ -34,7 +34,7 @@ app.frame("/", (c) => {
                 }}
             >
                 <div style={{ color: "#FF4500", fontSize: 62, lineHeight: 1.2 }}>ClawCook</div>
-                <div style={{ color: "white", fontSize: 28, marginTop: 12 }}>Roast-to-Earn Clawbot</div>
+                <div style={{ color: "white", fontSize: 28, marginTop: 12 }}>Deploy-to-Earn Clawbot</div>
                 <div style={{ color: "#B8B8B8", fontSize: 22, marginTop: 20 }}>
                     Enter Farcaster handle and pull the claw.
                 </div>
@@ -42,16 +42,16 @@ app.frame("/", (c) => {
         ),
         intents: [
             <TextInput key="input-handle" placeholder="@farcaster_handle" />,
-            <Button key="start-roast" value="roast">Roast Me</Button>,
+            <Button key="start-deploy" value="deploy">Deploy Me</Button>,
         ],
     });
 });
 
-app.frame("/roast", async (c) => {
+app.frame("/deploy", async (c) => {
     const username = normalizeHandle(c.inputText ?? "");
     if (!username) {
         return c.res({
-            action: "/roast",
+            action: "/deploy",
             image: (
                 <div
                     style={{
@@ -74,7 +74,7 @@ app.frame("/roast", async (c) => {
             ),
             intents: [
                 <TextInput key="input-handle-retry" placeholder="@farcaster_handle" />,
-                <Button key="retry-roast" value="retry">Try Again</Button>,
+                <Button key="retry-deploy" value="retry">Try Again</Button>,
             ],
         });
     }
@@ -84,7 +84,7 @@ app.frame("/roast", async (c) => {
         const distinctId = `fid:${fid}`;
         const rateLimit = await checkRateLimit(fid, username);
         if (!rateLimit.allowed) {
-            await captureServerEvent("frame_roast_rate_limited", distinctId, {
+            await captureServerEvent("frame_deploy_rate_limited", distinctId, {
                 username,
                 reason: rateLimit.reason ?? "rate_limit",
             });
@@ -114,10 +114,10 @@ app.frame("/roast", async (c) => {
         }
 
         const history = await fetchRecentCastsByFid(fid);
-        const result = await generateRoast(username, history);
-        const moderation = await moderateRoastText(result.roast);
+        const result = await generateDeploy(username, history);
+        const moderation = await moderateDeployText(result.deploy);
         if (!moderation.allowed) {
-            await captureServerEvent("frame_roast_moderation_blocked", distinctId, {
+            await captureServerEvent("frame_deploy_moderation_blocked", distinctId, {
                 username,
                 profile: result.profile,
                 score: result.score,
@@ -150,22 +150,22 @@ app.frame("/roast", async (c) => {
             });
         }
 
-        const persisted = await persistRoastEventToDb({
+        const persisted = await persistDeployEventToDb({
             username,
             profile: result.profile,
-            roast: result.roast,
+            deploy: result.deploy,
             score: result.score,
             source: "frame",
         });
         if (!persisted) {
-            await addRoastEvent({
+            await addDeployEvent({
                 username,
                 profile: result.profile,
-                roast: result.roast,
+                deploy: result.deploy,
                 score: result.score,
             });
         }
-        await captureServerEvent("frame_roast_success", distinctId, {
+        await captureServerEvent("frame_deploy_success", distinctId, {
             username,
             profile: result.profile,
             score: result.score,
@@ -191,18 +191,18 @@ app.frame("/roast", async (c) => {
                     </div>
                     <div style={{ color: "#FFD3C2", fontSize: 24, marginTop: 10 }}>{result.profile}</div>
                     <div style={{ color: "white", fontSize: 24, marginTop: 18, lineHeight: 1.35 }}>
-                        &ldquo;{result.roast}&rdquo;
+                        &ldquo;{result.deploy}&rdquo;
                     </div>
                 </div>
             ),
             intents: [
-                <Button.Reset key="reset-roast">Roast Another</Button.Reset>,
+                <Button.Reset key="reset-deploy">Deploy Another</Button.Reset>,
             ],
         });
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to roast profile.";
-        await captureServerException(error, { route: "/api/frame/roast" });
-        await captureServerEvent("frame_roast_error", "anonymous", { message });
+        const message = error instanceof Error ? error.message : "Failed to deploy profile.";
+        await captureServerException(error, { route: "/api/frame/deploy" });
+        await captureServerEvent("frame_deploy_error", "anonymous", { message });
         return c.res({
             image: (
                 <div
@@ -218,7 +218,7 @@ app.frame("/roast", async (c) => {
                         padding: "0 80px",
                     }}
                 >
-                    <div style={{ color: "#FF3B30", fontSize: 44 }}>Roast Failed</div>
+                    <div style={{ color: "#FF3B30", fontSize: 44 }}>Deploy Failed</div>
                     <div style={{ color: "white", fontSize: 22, marginTop: 12 }}>{message}</div>
                 </div>
             ),

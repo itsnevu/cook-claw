@@ -1,4 +1,4 @@
-export type RoastProfile = "Larping Dev" | "Vibes-only Trader" | "Reply Guy" | "Unknown";
+export type DeployProfile = "Larping Dev" | "Vibes-only Trader" | "Reply Guy" | "Unknown";
 
 export interface Cast {
     text: string;
@@ -6,13 +6,13 @@ export interface Cast {
     likes: number;
 }
 
-export interface RoastResult {
-    roast: string;
-    profile: RoastProfile;
+export interface DeployResult {
+    deploy: string;
+    profile: DeployProfile;
     score: number; // 0-100
 }
 
-export interface RoastEngineMetrics {
+export interface DeployEngineMetrics {
     totalRequests: number;
     aiSuccess: number;
     aiFailure: number;
@@ -23,7 +23,7 @@ export interface RoastEngineMetrics {
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/responses";
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
 
-const MOCK_ROASTS: Record<RoastProfile, string[]> = {
+const MOCK_DEPLOYS: Record<DeployProfile, string[]> = {
     "Larping Dev": [
         "Your GitHub contribution graph looks like a Morse code message for SOS.",
         "You spend more time configuring your neovim than shipping code.",
@@ -45,25 +45,25 @@ const MOCK_ROASTS: Record<RoastProfile, string[]> = {
     ]
 };
 
-const PROFILE_SET = new Set<RoastProfile>(["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"]);
+const PROFILE_SET = new Set<DeployProfile>(["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"]);
 
 declare global {
-    var __clawcookRoastEngineMetrics: RoastEngineMetrics | undefined;
+    var __clawcookDeployEngineMetrics: DeployEngineMetrics | undefined;
 }
 
-function getMetricsStore(): RoastEngineMetrics {
-    if (!globalThis.__clawcookRoastEngineMetrics) {
-        globalThis.__clawcookRoastEngineMetrics = {
+function getMetricsStore(): DeployEngineMetrics {
+    if (!globalThis.__clawcookDeployEngineMetrics) {
+        globalThis.__clawcookDeployEngineMetrics = {
             totalRequests: 0,
             aiSuccess: 0,
             aiFailure: 0,
             fallbackUsed: 0,
         };
     }
-    return globalThis.__clawcookRoastEngineMetrics;
+    return globalThis.__clawcookDeployEngineMetrics;
 }
 
-export function getRoastEngineMetrics(): RoastEngineMetrics {
+export function getDeployEngineMetrics(): DeployEngineMetrics {
     return { ...getMetricsStore() };
 }
 
@@ -71,7 +71,7 @@ function clampScore(score: number): number {
     return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-function inferProfileFromHistory(history: Cast[]): RoastProfile {
+function inferProfileFromHistory(history: Cast[]): DeployProfile {
     const allText = history.map((h) => h.text.toLowerCase()).join(" ");
 
     if (allText.includes("gm") || allText.includes("wagmi") || allText.includes("mint")) {
@@ -87,10 +87,10 @@ function inferProfileFromHistory(history: Cast[]): RoastProfile {
     return "Unknown";
 }
 
-function buildFallbackRoast(_username: string, history: Cast[]): RoastResult {
+function buildFallbackDeploy(_username: string, history: Cast[]): DeployResult {
     const profile = inferProfileFromHistory(history);
-    const roasts = MOCK_ROASTS[profile];
-    const roast = roasts[Math.floor(Math.random() * roasts.length)];
+    const deploys = MOCK_DEPLOYS[profile];
+    const deploy = deploys[Math.floor(Math.random() * deploys.length)];
 
     const avgLikes = history.length > 0
         ? history.reduce((sum, cast) => sum + cast.likes, 0) / history.length
@@ -98,7 +98,7 @@ function buildFallbackRoast(_username: string, history: Cast[]): RoastResult {
 
     const score = clampScore(20 + (history.length * 1.5) + (avgLikes * 2));
 
-    return { roast, profile, score };
+    return { deploy, profile, score };
 }
 
 function extractOutputText(response: unknown): string | null {
@@ -133,19 +133,19 @@ function extractOutputText(response: unknown): string | null {
     return null;
 }
 
-function validateRoastResult(candidate: unknown): RoastResult | null {
+function validateDeployResult(candidate: unknown): DeployResult | null {
     if (!candidate || typeof candidate !== "object") {
         return null;
     }
 
-    const roast = (candidate as { roast?: unknown }).roast;
+    const deploy = (candidate as { deploy?: unknown }).deploy;
     const profile = (candidate as { profile?: unknown }).profile;
     const score = (candidate as { score?: unknown }).score;
 
-    if (typeof roast !== "string" || roast.trim().length === 0) {
+    if (typeof deploy !== "string" || deploy.trim().length === 0) {
         return null;
     }
-    if (typeof profile !== "string" || !PROFILE_SET.has(profile as RoastProfile)) {
+    if (typeof profile !== "string" || !PROFILE_SET.has(profile as DeployProfile)) {
         return null;
     }
     if (typeof score !== "number") {
@@ -153,13 +153,13 @@ function validateRoastResult(candidate: unknown): RoastResult | null {
     }
 
     return {
-        roast: roast.trim(),
-        profile: profile as RoastProfile,
+        deploy: deploy.trim(),
+        profile: profile as DeployProfile,
         score: clampScore(score),
     };
 }
 
-async function generateRoastWithOpenAI(username: string, history: Cast[]): Promise<RoastResult | null> {
+async function generateDeployWithOpenAI(username: string, history: Cast[]): Promise<DeployResult | null> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
         return null;
@@ -178,7 +178,7 @@ async function generateRoastWithOpenAI(username: string, history: Cast[]): Promi
                 content: [
                     {
                         type: "input_text",
-                        text: "You are ClawCook roast engine. Return JSON only following the schema. Roast must be witty, non-hateful, and under 220 characters.",
+                        text: "You are ClawCook deploy engine. Return JSON only following the schema. Deploy must be witty, non-hateful, and under 220 characters.",
                     },
                 ],
             },
@@ -195,19 +195,19 @@ async function generateRoastWithOpenAI(username: string, history: Cast[]): Promi
         text: {
             format: {
                 type: "json_schema",
-                name: "roast_result",
+                name: "deploy_result",
                 strict: true,
                 schema: {
                     type: "object",
                     properties: {
-                        roast: { type: "string" },
+                        deploy: { type: "string" },
                         profile: {
                             type: "string",
                             enum: ["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"],
                         },
                         score: { type: "number", minimum: 0, maximum: 100 },
                     },
-                    required: ["roast", "profile", "score"],
+                    required: ["deploy", "profile", "score"],
                     additionalProperties: false,
                 },
             },
@@ -226,7 +226,7 @@ async function generateRoastWithOpenAI(username: string, history: Cast[]): Promi
     });
 
     if (!res.ok) {
-        throw new Error(`OpenAI roast request failed (${res.status}).`);
+        throw new Error(`OpenAI deploy request failed (${res.status}).`);
     }
 
     const payload = await res.json();
@@ -236,15 +236,15 @@ async function generateRoastWithOpenAI(username: string, history: Cast[]): Promi
     }
 
     const parsed = JSON.parse(outputText) as unknown;
-    return validateRoastResult(parsed);
+    return validateDeployResult(parsed);
 }
 
-export async function generateRoast(username: string, history: Cast[]): Promise<RoastResult> {
+export async function generateDeploy(username: string, history: Cast[]): Promise<DeployResult> {
     const metrics = getMetricsStore();
     metrics.totalRequests += 1;
 
     try {
-        const aiResult = await generateRoastWithOpenAI(username, history);
+        const aiResult = await generateDeployWithOpenAI(username, history);
         if (aiResult) {
             metrics.aiSuccess += 1;
             return aiResult;
@@ -252,9 +252,9 @@ export async function generateRoast(username: string, history: Cast[]): Promise<
     } catch (error) {
         metrics.aiFailure += 1;
         metrics.lastAiErrorAt = new Date().toISOString();
-        console.error("generateRoast: AI path failed, using fallback.", error);
+        console.error("generateDeploy: AI path failed, using fallback.", error);
     }
 
     metrics.fallbackUsed += 1;
-    return buildFallbackRoast(username, history);
+    return buildFallbackDeploy(username, history);
 }

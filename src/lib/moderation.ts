@@ -32,7 +32,7 @@ function buildReason(result: OpenAIModerationResult): string {
     return "Output blocked by safety policy.";
 }
 
-export async function moderateRoastText(text: string): Promise<ModerationResult> {
+export async function moderateDeployText(text: string): Promise<ModerationResult> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
         return { allowed: true };

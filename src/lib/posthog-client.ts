@@ -9,9 +9,9 @@ const EVENT_COOLDOWN_MS = Number(process.env.NEXT_PUBLIC_POSTHOG_EVENT_COOLDOWN_
 
 const EVENT_SAMPLE_RATES: Record<string, number> = {
     home_viewed: 1,
-    roast_initiated: 1,
-    roast_success: 1,
-    roast_error: 1,
+    deploy_initiated: 1,
+    deploy_success: 1,
+    deploy_error: 1,
 };
 
 function getDistinctId(): string {

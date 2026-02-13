@@ -98,7 +98,7 @@ export async function getIntegrationStatus(): Promise<IntegrationStatusItem[]> {
     }
     items.push({
         key: "openai",
-        name: "OpenAI (Roast + Moderation)",
+        name: "OpenAI (Deploy + Moderation)",
         required: true,
         state: openAiState,
         message: openAiMessage,

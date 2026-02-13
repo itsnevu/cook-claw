@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalBackground } from "@/components/GlobalBackground";
 import { WalletProviders } from "@/components/WalletProviders";
+import { CustomCursor } from "@/components/CustomCursor";
 
 const jakarta = Plus_Jakarta_Sans({
     subsets: ["latin"],
@@ -99,6 +100,7 @@ export default function RootLayout({
                     <GlobalBackground />
                 </div>
                 <WalletProviders>
+                    <CustomCursor />
                     <div className="relative z-10 flex min-h-screen flex-col">
                         <Navbar />
                         <div className="flex-1">{children}</div>

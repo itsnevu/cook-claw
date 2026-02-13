@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import type { RoastProfile } from "@/lib/roast-engine";
-import { addRoastEvent } from "@/lib/roast-store";
-import { persistRoastEventToDb } from "@/lib/roast-db";
+import type { DeployProfile } from "@/lib/deploy-engine";
+import { addDeployEvent } from "@/lib/deploy-store";
+import { persistDeployEventToDb } from "@/lib/deploy-db";
 
-const PROFILES: RoastProfile[] = ["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"];
+const PROFILES: DeployProfile[] = ["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"];
 const USERNAMES = [
     "alice",
     "buildermax",
@@ -16,7 +16,7 @@ const USERNAMES = [
     "onchainkid",
     "protocolcat",
 ];
-const ROASTS = [
+const DEPLOYS = [
     "Your alpha is always 24 hours late but still loud.",
     "You deploy vibes faster than features.",
     "Your timeline is 90% replies and 10% coping.",
@@ -62,24 +62,24 @@ export async function POST(req: Request) {
         const profile = pickOne(PROFILES);
         const username = pickOne(USERNAMES);
         const score = randomInt(20, 99);
-        const roast = pickOne(ROASTS);
+        const deploy = pickOne(DEPLOYS);
         const backMinutes = randomInt(0, daysBack * 24 * 60);
         const createdAt = new Date(Date.now() - backMinutes * 60_000).toISOString();
 
-        const persisted = await persistRoastEventToDb({
+        const persisted = await persistDeployEventToDb({
             username,
             profile,
             score,
-            roast,
+            deploy,
             createdAt,
             source: "seed",
         });
         if (!persisted) {
-            await addRoastEvent({
+            await addDeployEvent({
                 username,
                 profile,
                 score,
-                roast,
+                deploy,
                 createdAt,
             });
         }

@@ -1,13 +1,13 @@
 # ClawCook
 
-ClawCook is a Next.js application for Farcaster profile roasting with a game-like interaction model, live market ticker, leaderboard views, and operational analytics dashboards.
+ClawCook is a Next.js application for Farcaster profile deploying with a game-like interaction model, live market ticker, leaderboard views, and operational analytics dashboards.
 
 ## Overview
 
 This project includes:
 
-- Roast generation pipeline using Farcaster profile activity
-- Moderation gate for generated roast content
+- Deploy generation pipeline using Farcaster profile activity
+- Moderation gate for generated deploy content
 - Frame endpoint for Farcaster-compatible interactions
 - Live ticker data with fallback market providers
 - Leaderboard, metrics, and analytics pages
@@ -75,13 +75,13 @@ DATABASE_URL=file:./dev.db
 
 ## API Endpoints
 
-### Roast and Frame
+### Deploy and Frame
 
-- `POST /api/roast`
-  - Generates roast output from Farcaster data
+- `POST /api/deploy`
+  - Generates deploy output from Farcaster data
   - Applies moderation before returning/storing
 - `GET|POST /api/frame/[[...routes]]`
-  - Frame-compatible roast flow
+  - Frame-compatible deploy flow
 
 ### Data Surfaces
 
@@ -99,7 +99,7 @@ DATABASE_URL=file:./dev.db
 ### Development Utility
 
 - `POST /api/dev/seed`
-  - Seeds development roast data
+  - Seeds development deploy data
   - Disabled in production
   - Optional protection with `DEV_SEED_TOKEN`
 

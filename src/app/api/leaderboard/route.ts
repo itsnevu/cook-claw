@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getLeaderboard, getRecentRoasts, type LeaderboardPeriod } from "@/lib/roast-store";
-import { getLeaderboardFromDb, getRecentRoastsFromDb } from "@/lib/roast-db";
+import { getLeaderboard, getRecentDeploys, type LeaderboardPeriod } from "@/lib/deploy-store";
+import { getLeaderboardFromDb, getRecentDeploysFromDb } from "@/lib/deploy-db";
 
 function parsePeriod(value: string | null): LeaderboardPeriod {
     if (value === "daily" || value === "weekly" || value === "all") {
@@ -22,13 +22,13 @@ export async function GET(req: Request) {
 
     const [dbLeaderboard, dbRecent] = await Promise.all([
         getLeaderboardFromDb(limit, minAttempts, period),
-        getRecentRoastsFromDb(recent),
+        getRecentDeploysFromDb(recent),
     ]);
 
     return NextResponse.json({
         period,
         minAttempts,
         leaderboard: dbLeaderboard ?? await getLeaderboard(limit, minAttempts, period),
-        recentRoasts: dbRecent ?? await getRecentRoasts(recent),
+        recentDeploys: dbRecent ?? await getRecentDeploys(recent),
     });
 }

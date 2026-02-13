@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getRoastAggregateMetrics } from "@/lib/roast-store";
+import { getDeployAggregateMetrics } from "@/lib/deploy-store";
 import { captureServerEvent } from "@/lib/telemetry";
 import { captureServerException } from "@/lib/sentry";
-import { getRoastAggregateFromDb } from "@/lib/roast-db";
+import { getDeployAggregateFromDb } from "@/lib/deploy-db";
 
 const GECKO_BASE = "https://api.coingecko.com/api/v3";
 const VS_CURRENCY = "usd";
@@ -16,7 +16,7 @@ interface TickerResponse {
     claw: number | null;
     fdv: number | null;
     users: number;
-    roasts: number;
+    deploys: number;
     updatedAt: string;
 }
 
@@ -101,8 +101,8 @@ export async function GET() {
             fetchSimplePrices(),
             fetchClawMarketData(),
             fetchClawDexFallback(),
-            getRoastAggregateFromDb("all"),
-            getRoastAggregateMetrics("all"),
+            getDeployAggregateFromDb("all"),
+            getDeployAggregateMetrics("all"),
         ]);
         const allTime = dbAllTime ?? memAllTime;
 
@@ -123,7 +123,7 @@ export async function GET() {
             claw,
             fdv,
             users: allTime.uniqueUsers,
-            roasts: allTime.totalRoasts,
+            deploys: allTime.totalDeploys,
             updatedAt: new Date().toISOString(),
         };
 
@@ -137,7 +137,7 @@ export async function GET() {
                 claw: null,
                 fdv: null,
                 users: 0,
-                roasts: 0,
+                deploys: 0,
                 updatedAt: new Date().toISOString(),
             } satisfies TickerResponse,
             { status: 200 }

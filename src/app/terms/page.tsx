@@ -28,7 +28,7 @@ export default function TermsPage() {
     return (
         <main className="relative min-h-screen overflow-hidden bg-black/55 px-6 pb-16 pt-28 sm:px-16 sm:pt-32">
             <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[560px] w-[560px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-140 w-140 rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
 
             <div className="relative z-20 mx-auto w-full max-w-5xl">
                 <section className="glass-panel rounded-2xl p-7 sm:p-10">

@@ -31,15 +31,15 @@ export function ClawMachine({ isGrabbing }: ClawMachineProps) {
                     animate={{ y: isGrabbing ? 166 : 52 }}
                     transition={{ duration: isGrabbing ? DROP_DURATION : 0.22, ease: isGrabbing ? "easeIn" : "easeOut" }}
                 >
-                    <div className="relative h-17 w-45 overflow-hidden rounded-xl border border-orange-200/25 bg-linear-to-br from-stone-900/95 via-stone-900 to-stone-950 shadow-[0_18px_34px_rgba(28,12,2,0.68)]">
+                    <div className="relative h-12 w-36 overflow-hidden rounded-lg border border-orange-200/25 bg-linear-to-br from-stone-900/95 via-stone-900 to-stone-950 shadow-[0_10px_20px_rgba(28,12,2,0.62)]">
                         <div className="absolute inset-0 bg-linear-to-r from-transparent via-orange-100/10 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-2">
-                            <div className="rounded border border-orange-300/30 bg-black/40 px-2 py-1 text-[9px] font-medium uppercase tracking-[0.12em] text-orange-100/90">
+                        <div className="absolute inset-x-0 bottom-1 flex items-center justify-center gap-1">
+                            <div className="rounded border border-orange-300/30 bg-black/40 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-[0.1em] text-orange-100/90">
                                 Deploy Status Live
                             </div>
                             <motion.div
                                 className={cn(
-                                    "h-2.5 w-2.5 rounded-full shadow-[0_0_14px_currentColor]",
+                                    "h-1.5 w-1.5 rounded-full shadow-[0_0_10px_currentColor]",
                                     "bg-orange-300 text-orange-300"
                                 )}
                                 animate={isGrabbing ? { scale: [1, 1.2, 1] } : { scale: [1, 1.1, 1] }}

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { fetchRecentCastsByFid, normalizeHandle, resolveFidByUsername } from "@/lib/farcaster";
-import { generateRoast } from "@/lib/roast-engine";
+import { generateDeploy } from "@/lib/deploy-engine";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { addRoastEvent } from "@/lib/roast-store";
-import { moderateRoastText } from "@/lib/moderation";
+import { addDeployEvent } from "@/lib/deploy-store";
+import { moderateDeployText } from "@/lib/moderation";
 import { captureServerEvent } from "@/lib/telemetry";
 import { captureServerException } from "@/lib/sentry";
-import { persistRoastEventToDb } from "@/lib/roast-db";
+import { persistDeployEventToDb } from "@/lib/deploy-db";
 
 export async function POST(req: Request) {
     try {
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         const rateLimitStatus = await checkRateLimit(fid, username, { ip: forwardedFor });
 
         if (!rateLimitStatus.allowed) {
-            await captureServerEvent("roast_rate_limited", distinctId, {
+            await captureServerEvent("deploy_rate_limited", distinctId, {
                 username,
                 reason: rateLimitStatus.reason ?? "rate_limit",
             });
@@ -34,37 +34,37 @@ export async function POST(req: Request) {
         }
 
         const history = await fetchRecentCastsByFid(fid);
-        const result = await generateRoast(username, history);
-        const moderation = await moderateRoastText(result.roast);
+        const result = await generateDeploy(username, history);
+        const moderation = await moderateDeployText(result.deploy);
         if (!moderation.allowed) {
-            await captureServerEvent("roast_moderation_blocked", distinctId, {
+            await captureServerEvent("deploy_moderation_blocked", distinctId, {
                 username,
                 profile: result.profile,
                 score: result.score,
                 reason: moderation.reason ?? "moderation_blocked",
             });
             return NextResponse.json(
-                { error: moderation.reason ?? "Roast blocked by moderation policy." },
+                { error: moderation.reason ?? "Deploy blocked by moderation policy." },
                 { status: 422 }
             );
         }
 
-        const persisted = await persistRoastEventToDb({
+        const persisted = await persistDeployEventToDb({
             username,
             profile: result.profile,
-            roast: result.roast,
+            deploy: result.deploy,
             score: result.score,
             source: "api",
         });
         if (!persisted) {
-            await addRoastEvent({
+            await addDeployEvent({
                 username,
                 profile: result.profile,
-                roast: result.roast,
+                deploy: result.deploy,
                 score: result.score,
             });
         }
-        await captureServerEvent("roast_success", distinctId, {
+        await captureServerEvent("deploy_success", distinctId, {
             username,
             profile: result.profile,
             score: result.score,
@@ -72,9 +72,9 @@ export async function POST(req: Request) {
 
         return NextResponse.json(result);
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to generate roast.";
-        await captureServerException(error, { route: "/api/roast" });
-        await captureServerEvent("roast_error", "anonymous", {
+        const message = error instanceof Error ? error.message : "Failed to generate deploy.";
+        await captureServerException(error, { route: "/api/deploy" });
+        await captureServerEvent("deploy_error", "anonymous", {
             message,
         });
         return NextResponse.json({ error: message }, { status: 500 });

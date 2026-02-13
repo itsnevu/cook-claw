@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getRoastEngineMetrics } from "@/lib/roast-engine";
+import { getDeployEngineMetrics } from "@/lib/deploy-engine";
 import { getRateLimitMetrics } from "@/lib/rate-limit";
-import { getRoastAggregateMetrics } from "@/lib/roast-store";
+import { getDeployAggregateMetrics } from "@/lib/deploy-store";
 import { appendMetricsSnapshot, getMetricsHistory } from "@/lib/metrics-store";
-import { getRoastAggregateFromDb } from "@/lib/roast-db";
+import { getDeployAggregateFromDb } from "@/lib/deploy-db";
 
 function isAuthorized(req: Request): boolean {
     const expected = process.env.METRICS_API_TOKEN;
@@ -40,23 +40,23 @@ export async function GET(req: Request) {
     const untilTs = parseDateParam(url.searchParams.get("until"));
 
     const [dbAllTime, dbDaily, memAllTime, memDaily] = await Promise.all([
-        getRoastAggregateFromDb("all"),
-        getRoastAggregateFromDb("daily"),
-        getRoastAggregateMetrics("all"),
-        getRoastAggregateMetrics("daily"),
+        getDeployAggregateFromDb("all"),
+        getDeployAggregateFromDb("daily"),
+        getDeployAggregateMetrics("all"),
+        getDeployAggregateMetrics("daily"),
     ]);
     const allTime = dbAllTime ?? memAllTime;
     const daily = dbDaily ?? memDaily;
 
-    const roastEngine = getRoastEngineMetrics();
+    const deployEngine = getDeployEngineMetrics();
     const rateLimit = getRateLimitMetrics();
     const generatedAt = new Date().toISOString();
 
     await appendMetricsSnapshot({
         timestamp: generatedAt,
-        totalRequests: roastEngine.totalRequests,
-        aiFailures: roastEngine.aiFailure,
-        fallbackUsed: roastEngine.fallbackUsed,
+        totalRequests: deployEngine.totalRequests,
+        aiFailures: deployEngine.aiFailure,
+        fallbackUsed: deployEngine.fallbackUsed,
         blockedTotal: rateLimit.blockedIpMinute + rateLimit.blockedUserMinute + rateLimit.blockedUserDaily,
     });
 
@@ -91,7 +91,7 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({
-        roastEngine,
+        deployEngine,
         rateLimit,
         aggregates: {
             allTime,

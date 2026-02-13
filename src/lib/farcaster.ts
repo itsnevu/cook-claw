@@ -1,4 +1,4 @@
-import type { Cast } from "@/lib/roast-engine";
+import type { Cast } from "@/lib/deploy-engine";
 
 const NEYNAR_BASE_URL = "https://api.neynar.com/v2/farcaster";
 const DEFAULT_LIMIT = 20;

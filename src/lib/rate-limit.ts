@@ -163,7 +163,7 @@ export async function checkRateLimit(fid: number, username: string, options: Rat
         metrics.blockedUserDaily += 1;
         return {
             allowed: false,
-            reason: `Daily roast limit reached (${USER_DAILY_LIMIT}). Come back tomorrow.`,
+            reason: `Daily deploy limit reached (${USER_DAILY_LIMIT}). Come back tomorrow.`,
         };
     }
 

@@ -1,11 +1,11 @@
-import type { RoastProfile } from "@/lib/roast-engine";
+import type { DeployProfile } from "@/lib/deploy-engine";
 
-export interface RoastEvent {
+export interface DeployEvent {
     id: string;
     username: string;
-    profile: RoastProfile;
+    profile: DeployProfile;
     score: number;
-    roast: string;
+    deploy: string;
     createdAt: string;
 }
 
@@ -14,42 +14,42 @@ export interface LeaderboardEntry {
     attempts: number;
     averageScore: number;
     bestScore: number;
-    lastProfile: RoastProfile;
+    lastProfile: DeployProfile;
     lastAt: string;
 }
 
 export type LeaderboardPeriod = "daily" | "weekly" | "all";
 
-export interface RoastAggregateMetrics {
-    totalRoasts: number;
+export interface DeployAggregateMetrics {
+    totalDeploys: number;
     uniqueUsers: number;
     averageScore: number;
     bestScore: number;
-    profileBreakdown: Record<RoastProfile, number>;
+    profileBreakdown: Record<DeployProfile, number>;
 }
 
-export interface AddRoastEventInput extends Omit<RoastEvent, "id" | "createdAt"> {
+export interface AddDeployEventInput extends Omit<DeployEvent, "id" | "createdAt"> {
     createdAt?: string;
 }
 
-interface RoastStoreState {
-    events: RoastEvent[];
+interface DeployStoreState {
+    events: DeployEvent[];
 }
 
 const MAX_EVENTS = 1000;
-const REDIS_EVENTS_KEY = "clawcook:roast_events";
+const REDIS_EVENTS_KEY = "clawcook:deploy_events";
 const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
 const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 declare global {
-    var __clawcookRoastStore: RoastStoreState | undefined;
+    var __clawcookDeployStore: DeployStoreState | undefined;
 }
 
-function getStore(): RoastStoreState {
-    if (!globalThis.__clawcookRoastStore) {
-        globalThis.__clawcookRoastStore = { events: [] };
+function getStore(): DeployStoreState {
+    if (!globalThis.__clawcookDeployStore) {
+        globalThis.__clawcookDeployStore = { events: [] };
     }
-    return globalThis.__clawcookRoastStore;
+    return globalThis.__clawcookDeployStore;
 }
 
 function isRedisConfigured(): boolean {
@@ -79,8 +79,8 @@ async function redisPipeline(commands: Array<Array<string>>): Promise<unknown[]>
     return payload.map((item) => item.result);
 }
 
-export async function addRoastEvent(input: AddRoastEventInput): Promise<RoastEvent> {
-    const event: RoastEvent = {
+export async function addDeployEvent(input: AddDeployEventInput): Promise<DeployEvent> {
+    const event: DeployEvent = {
         id: crypto.randomUUID(),
         createdAt: input.createdAt ?? new Date().toISOString(),
         ...input,
@@ -99,14 +99,14 @@ export async function addRoastEvent(input: AddRoastEventInput): Promise<RoastEve
                 ["LTRIM", REDIS_EVENTS_KEY, "0", String(MAX_EVENTS - 1)],
             ]);
         } catch (error) {
-            console.error("addRoastEvent: redis write failed, memory fallback only.", error);
+            console.error("addDeployEvent: redis write failed, memory fallback only.", error);
         }
     }
 
     return event;
 }
 
-export async function getRecentRoasts(limit = 20): Promise<RoastEvent[]> {
+export async function getRecentDeploys(limit = 20): Promise<DeployEvent[]> {
     const safeLimit = Math.max(1, Math.min(limit, 100));
 
     if (isRedisConfigured()) {
@@ -123,22 +123,22 @@ export async function getRecentRoasts(limit = 20): Promise<RoastEvent[]> {
                             return null;
                         }
                         try {
-                            return JSON.parse(item) as RoastEvent;
+                            return JSON.parse(item) as DeployEvent;
                         } catch {
                             return null;
                         }
                     })
-                    .filter((item): item is RoastEvent => item !== null);
+                    .filter((item): item is DeployEvent => item !== null);
             }
         } catch (error) {
-            console.error("getRecentRoasts: redis read failed, using memory fallback.", error);
+            console.error("getRecentDeploys: redis read failed, using memory fallback.", error);
         }
     }
 
     return getStore().events.slice(0, safeLimit);
 }
 
-function filterEventsByPeriod(events: RoastEvent[], period: LeaderboardPeriod): RoastEvent[] {
+function filterEventsByPeriod(events: DeployEvent[], period: LeaderboardPeriod): DeployEvent[] {
     if (period === "all") {
         return events;
     }
@@ -158,8 +158,8 @@ export async function getLeaderboard(
     minAttempts = 1,
     period: LeaderboardPeriod = "all"
 ): Promise<LeaderboardEntry[]> {
-    const sourceEvents = filterEventsByPeriod(await getRecentRoasts(MAX_EVENTS), period);
-    const byUser = new Map<string, RoastEvent[]>();
+    const sourceEvents = filterEventsByPeriod(await getRecentDeploys(MAX_EVENTS), period);
+    const byUser = new Map<string, DeployEvent[]>();
 
     for (const event of sourceEvents) {
         const key = event.username.toLowerCase();
@@ -196,9 +196,9 @@ export async function getLeaderboard(
         .slice(0, limit);
 }
 
-export async function getRoastAggregateMetrics(period: LeaderboardPeriod = "all"): Promise<RoastAggregateMetrics> {
-    const events = filterEventsByPeriod(await getRecentRoasts(MAX_EVENTS), period);
-    const profileBreakdown: Record<RoastProfile, number> = {
+export async function getDeployAggregateMetrics(period: LeaderboardPeriod = "all"): Promise<DeployAggregateMetrics> {
+    const events = filterEventsByPeriod(await getRecentDeploys(MAX_EVENTS), period);
+    const profileBreakdown: Record<DeployProfile, number> = {
         "Larping Dev": 0,
         "Vibes-only Trader": 0,
         "Reply Guy": 0,
@@ -221,7 +221,7 @@ export async function getRoastAggregateMetrics(period: LeaderboardPeriod = "all"
     const averageScore = events.length > 0 ? Math.round((scoreSum / events.length) * 10) / 10 : 0;
 
     return {
-        totalRoasts: events.length,
+        totalDeploys: events.length,
         uniqueUsers: users.size,
         averageScore,
         bestScore,

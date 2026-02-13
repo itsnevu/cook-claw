@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 interface MetricsResponse {
-    roastEngine: {
+    deployEngine: {
         totalRequests: number;
         aiSuccess: number;
         aiFailure: number;
@@ -17,7 +17,7 @@ interface MetricsResponse {
     };
     aggregates: {
         daily: {
-            totalRoasts: number;
+            totalDeploys: number;
             uniqueUsers: number;
             averageScore: number;
             profileBreakdown: Record<string, number>;
@@ -125,16 +125,16 @@ export default function AnalyticsPage() {
             metrics.rateLimit.blockedIpMinute +
             metrics.rateLimit.blockedUserMinute +
             metrics.rateLimit.blockedUserDaily;
-        const moderationOrFallback = metrics.roastEngine.fallbackUsed;
-        const requests = metrics.roastEngine.totalRequests;
+        const moderationOrFallback = metrics.deployEngine.fallbackUsed;
+        const requests = metrics.deployEngine.totalRequests;
         const topProfile = findTopProfile(metrics.aggregates.daily.profileBreakdown);
         const topHandle = leaderboard?.leaderboard?.[0]?.username ?? "-";
 
         return {
-            successRate: pct(metrics.roastEngine.aiSuccess, requests),
+            successRate: pct(metrics.deployEngine.aiSuccess, requests),
             fallbackRate: pct(moderationOrFallback, requests),
             blockRate: pct(blocked, blocked + metrics.rateLimit.allowed),
-            dailyRoasts: metrics.aggregates.daily.totalRoasts,
+            dailyDeploys: metrics.aggregates.daily.totalDeploys,
             dailyUsers: metrics.aggregates.daily.uniqueUsers,
             topProfile,
             topHandle,
@@ -190,7 +190,7 @@ export default function AnalyticsPage() {
                         </article>
                         <article className="glass-panel rounded-2xl p-5">
                             <p className="text-xs font-mono uppercase tracking-widest text-neutral-400">Daily Deploys</p>
-                            <p className="mt-2 text-3xl font-bold text-white">{kpis.dailyRoasts}</p>
+                            <p className="mt-2 text-3xl font-bold text-white">{kpis.dailyDeploys}</p>
                         </article>
                         <article className="glass-panel rounded-2xl p-5">
                             <p className="text-xs font-mono uppercase tracking-widest text-neutral-400">Daily Users</p>

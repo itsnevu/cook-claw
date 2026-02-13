@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, animate, useMotionValue } from "framer-motion";
 import { ClawMachine } from "@/components/ClawMachine";
-import type { RoastResult } from "@/lib/roast-engine";
-import type { LeaderboardEntry, RoastEvent } from "@/lib/roast-store";
+import type { DeployResult } from "@/lib/deploy-engine";
+import type { LeaderboardEntry, DeployEvent } from "@/lib/deploy-store";
 import Link from "next/link";
 import Script from "next/script";
 import { captureClientEvent } from "@/lib/posthog-client";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { Marquee3D } from "@/components/Marquee3D";
 
 interface TickerData {
     btc: number | null;
@@ -16,10 +17,10 @@ interface TickerData {
     claw: number | null;
     fdv: number | null;
     users: number;
-    roasts: number;
+    deploys: number;
 }
 
-type MetricKey = "btc" | "eth" | "claw" | "fdv" | "users" | "roasts";
+type MetricKey = "btc" | "eth" | "claw" | "fdv" | "users" | "deploys";
 type PulseState = "up" | "down" | "flat";
 type NoticeLevel = "info" | "success" | "warning";
 type NoticeCategory = "market" | "leaderboard" | "tx";
@@ -63,7 +64,7 @@ const TIMEFRAME_POINTS: Record<SparkTimeframe, number> = {
 
 interface LeaderboardPreviewResponse {
     leaderboard: LeaderboardEntry[];
-    recentRoasts: RoastEvent[];
+    recentDeploys: DeployEvent[];
 }
 
 const FAKE_HANDLES = [
@@ -95,14 +96,14 @@ const FAKE_HANDLES = [
     "chainminer",
 ];
 
-const FAKE_PROFILES: RoastResult["profile"][] = [
+const FAKE_PROFILES: DeployResult["profile"][] = [
     "Larping Dev",
     "Vibes-only Trader",
     "Reply Guy",
     "Unknown",
 ];
 
-const FAKE_ROAST_LINES = [
+const FAKE_DEPLOY_LINES = [
     "Deploy density high, execution latency still visible.",
     "Deployment map sharp, timing layer needs one more pass.",
     "Telemetry rich, narrative framing even richer.",
@@ -157,7 +158,7 @@ function buildFakeLeaderboard(count = 5): LeaderboardEntry[] {
     }));
 }
 
-function buildFakeFeedItem(): RoastEvent {
+function buildFakeFeedItem(): DeployEvent {
     const moduleName = pickRandom(FAKE_MODULES);
     const handle = pickRandom(FAKE_HANDLES);
     const profile = pickRandom(FAKE_PROFILES);
@@ -166,19 +167,19 @@ function buildFakeFeedItem(): RoastEvent {
         username: handle,
         profile,
         score: randomInt(62, 99),
-        roast: `Deploy ${moduleName} by @${handle}. ${pickRandom(FAKE_ROAST_LINES)}`,
+        deploy: `Deploy ${moduleName} by @${handle}. ${pickRandom(FAKE_DEPLOY_LINES)}`,
         createdAt: new Date().toISOString(),
     };
 }
 
-function buildFakeRoastResult(target: string): RoastResult {
+function buildFakeDeployResult(target: string): DeployResult {
     const profile = pickRandom(FAKE_PROFILES);
     const score = randomInt(58, 97);
-    const roastLine = pickRandom(FAKE_ROAST_LINES);
+    const deployLine = pickRandom(FAKE_DEPLOY_LINES);
     return {
         profile,
         score,
-        roast: `@${target} ${roastLine}`,
+        deploy: `@${target} ${deployLine}`,
     };
 }
 
@@ -209,7 +210,7 @@ function buildFakeTx(): TxStreamItem {
     };
 }
 
-function buildTxFromRoast(event: RoastEvent): TxStreamItem {
+function buildTxFromDeploy(event: DeployEvent): TxStreamItem {
     const cleanId = event.id.replace(/-/g, "");
     const hashCore = cleanId.length >= 22 ? cleanId : `${cleanId}${randomHex(22 - cleanId.length)}`;
     const eventTs = Date.parse(event.createdAt);
@@ -353,7 +354,7 @@ export default function Home() {
     const [timeframe, setTimeframe] = useState<SparkTimeframe>("15m");
     const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState<RoastResult | null>(null);
+    const [result, setResult] = useState<DeployResult | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [ticker, setTicker] = useState<TickerData>({
         btc: 65976,
@@ -361,10 +362,10 @@ export default function Home() {
         claw: 0.003426,
         fdv: 5_800_000,
         users: 28140,
-        roasts: 461229,
+        deploys: 461229,
     });
     const [leaderboardPreview, setLeaderboardPreview] = useState<LeaderboardEntry[]>(() => buildFakeLeaderboard(5));
-    const [recentFeed, setRecentFeed] = useState<RoastEvent[]>(() =>
+    const [recentFeed, setRecentFeed] = useState<DeployEvent[]>(() =>
         Array.from({ length: 5 }, () => buildFakeFeedItem())
     );
     const [txStream, setTxStream] = useState<TxStreamItem[]>(() =>
@@ -381,7 +382,7 @@ export default function Home() {
         claw: "flat",
         fdv: "flat",
         users: "flat",
-        roasts: "flat",
+        deploys: "flat",
     });
     const [metricTrend, setMetricTrend] = useState<Record<MetricKey, number>>({
         btc: 0,
@@ -389,7 +390,7 @@ export default function Home() {
         claw: 0,
         fdv: 0,
         users: 0,
-        roasts: 0,
+        deploys: 0,
     });
     const [liveNotices, setLiveNotices] = useState<LiveNotice[]>([]);
     const [noticeHistory, setNoticeHistory] = useState<LiveNotice[]>([]);
@@ -400,10 +401,10 @@ export default function Home() {
     const pulseResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const leaderboardTopRef = useRef<string>(leaderboardPreview[0]?.username ?? "");
     const prevRealTickerRef = useRef<TickerData | null>(null);
-    const seenRoastIdsRef = useRef<Set<string>>(new Set());
+    const seenDeployIdsRef = useRef<Set<string>>(new Set());
     const notificationsEnabledRef = useRef(true);
     const fallbackLeaderboardRef = useRef<LeaderboardEntry[]>(buildFakeLeaderboard(5));
-    const fallbackRecentFeedRef = useRef<RoastEvent[]>(Array.from({ length: 5 }, () => buildFakeFeedItem()));
+    const fallbackRecentFeedRef = useRef<DeployEvent[]>(Array.from({ length: 5 }, () => buildFakeFeedItem()));
     const fallbackTxStreamRef = useRef<TxStreamItem[]>(Array.from({ length: 6 }, () => buildFakeTx()));
     const fallbackNoticesRef = useRef<LiveNotice[]>([
         {
@@ -509,7 +510,7 @@ export default function Home() {
                     claw: nextClaw,
                     fdv: nextClaw * randomBetween(1_450_000_000, 1_900_000_000),
                     users: prev.users + randomInt(2, 12),
-                    roasts: prev.roasts + randomInt(8, 35),
+                    deploys: prev.deploys + randomInt(8, 35),
                 };
 
                 const nextPulse: Record<MetricKey, PulseState> = {
@@ -518,7 +519,7 @@ export default function Home() {
                     claw: (nextTicker.claw ?? 0) >= (prev.claw ?? 0) ? "up" : "down",
                     fdv: (nextTicker.fdv ?? 0) >= (prev.fdv ?? 0) ? "up" : "down",
                     users: (nextTicker.users ?? 0) >= (prev.users ?? 0) ? "up" : "down",
-                    roasts: (nextTicker.roasts ?? 0) >= (prev.roasts ?? 0) ? "up" : "down",
+                    deploys: (nextTicker.deploys ?? 0) >= (prev.deploys ?? 0) ? "up" : "down",
                 };
 
                 setMetricPulse(nextPulse);
@@ -528,7 +529,7 @@ export default function Home() {
                     claw: percentageChange(prev.claw ?? nextTicker.claw ?? 0, nextTicker.claw ?? 0),
                     fdv: percentageChange(prev.fdv ?? nextTicker.fdv ?? 0, nextTicker.fdv ?? 0),
                     users: percentageChange(prev.users, nextTicker.users),
-                    roasts: percentageChange(prev.roasts, nextTicker.roasts),
+                    deploys: percentageChange(prev.deploys, nextTicker.deploys),
                 });
                 setSparkline((lines) => ({
                     btc: [...lines.btc, nextTicker.btc ?? 0].slice(-32),
@@ -561,11 +562,11 @@ export default function Home() {
                     );
                 }
 
-                if (!emittedNotice && Math.floor(prev.roasts / 1000) !== Math.floor(nextTicker.roasts / 1000)) {
+                if (!emittedNotice && Math.floor(prev.deploys / 1000) !== Math.floor(nextTicker.deploys / 1000)) {
                     emittedNotice = true;
                     pushNotice(
                         "Deploy Milestone",
-                        `Protocol passed ${NUMBER_INT.format(Math.floor(nextTicker.roasts / 1000) * 1000)} total deploy events.`,
+                        `Protocol passed ${NUMBER_INT.format(Math.floor(nextTicker.deploys / 1000) * 1000)} total deploy events.`,
                         "info",
                         "market"
                     );
@@ -581,7 +582,7 @@ export default function Home() {
                         claw: "flat",
                         fdv: "flat",
                         users: "flat",
-                        roasts: "flat",
+                        deploys: "flat",
                     });
                 }, 900);
 
@@ -704,7 +705,7 @@ export default function Home() {
                             claw: (nextTicker.claw ?? 0) >= (prev.claw ?? 0) ? "up" : "down",
                             fdv: (nextTicker.fdv ?? 0) >= (prev.fdv ?? 0) ? "up" : "down",
                             users: (nextTicker.users ?? 0) >= (prev.users ?? 0) ? "up" : "down",
-                            roasts: (nextTicker.roasts ?? 0) >= (prev.roasts ?? 0) ? "up" : "down",
+                            deploys: (nextTicker.deploys ?? 0) >= (prev.deploys ?? 0) ? "up" : "down",
                         };
                         setMetricPulse(pulse);
                         setMetricTrend({
@@ -713,7 +714,7 @@ export default function Home() {
                             claw: percentageChange(prev.claw ?? nextTicker.claw ?? 0, nextTicker.claw ?? 0),
                             fdv: percentageChange(prev.fdv ?? nextTicker.fdv ?? 0, nextTicker.fdv ?? 0),
                             users: percentageChange(prev.users, nextTicker.users),
-                            roasts: percentageChange(prev.roasts, nextTicker.roasts),
+                            deploys: percentageChange(prev.deploys, nextTicker.deploys),
                         });
                         setSparkline((lines) => ({
                             btc: [...lines.btc, nextTicker.btc ?? 0].slice(-32),
@@ -756,7 +757,7 @@ export default function Home() {
                 if (boardRes.ok) {
                     const boardPayload = await boardRes.json() as LeaderboardPreviewResponse;
                     setLeaderboardPreview(boardPayload.leaderboard ?? []);
-                    setRecentFeed(boardPayload.recentRoasts ?? []);
+                    setRecentFeed(boardPayload.recentDeploys ?? []);
 
                     const nextTop = boardPayload.leaderboard?.[0]?.username ?? "";
                     const prevTop = leaderboardTopRef.current;
@@ -772,17 +773,17 @@ export default function Home() {
                         leaderboardTopRef.current = nextTop;
                     }
 
-                    const fresh = (boardPayload.recentRoasts ?? []).slice(0, 6);
-                    setTxStream(fresh.map(buildTxFromRoast));
+                    const fresh = (boardPayload.recentDeploys ?? []).slice(0, 6);
+                    setTxStream(fresh.map(buildTxFromDeploy));
 
-                    const seen = seenRoastIdsRef.current;
-                    for (const roast of fresh) {
-                        if (!seen.has(roast.id)) {
-                            seen.add(roast.id);
-                            if (roast.score >= 90) {
+                    const seen = seenDeployIdsRef.current;
+                    for (const deploy of fresh) {
+                        if (!seen.has(deploy.id)) {
+                            seen.add(deploy.id);
+                            if (deploy.score >= 90) {
                                 pushNotice(
                                     "High Deploy Score",
-                                    `@${roast.username} reached score ${roast.score}.`,
+                                    `@${deploy.username} reached score ${deploy.score}.`,
                                     "success",
                                     "leaderboard"
                                 );
@@ -793,7 +794,7 @@ export default function Home() {
 
                     if (seen.size > 200) {
                         const latestIds = new Set(fresh.map((item) => item.id));
-                        seenRoastIdsRef.current = latestIds;
+                        seenDeployIdsRef.current = latestIds;
                     }
                 }
 
@@ -881,7 +882,7 @@ export default function Home() {
         }, 650 * (labels.length + 1));
     };
 
-    const handleRoast = async () => {
+    const handleDeploy = async () => {
         const normalizedUsername = username.trim().replace(/^@/, "");
         if (!normalizedUsername) return;
         if (!isConnected) {
@@ -890,7 +891,7 @@ export default function Home() {
             pushNotice("Wallet Required", "Connect your wallet first to continue deployment.", "warning", "tx");
             return;
         }
-        void captureClientEvent("roast_initiated", {
+        void captureClientEvent("deploy_initiated", {
             username_length: normalizedUsername.length,
             has_wallet: true,
         });
@@ -907,8 +908,58 @@ export default function Home() {
         { key: "claw", label: "X402", value: ticker.claw, sparklineKey: "claw" },
         { key: "fdv", label: "FDV", value: ticker.fdv },
         { key: "users", label: "OPERATORS", value: ticker.users },
-        { key: "roasts", label: "DEPLOYS", value: ticker.roasts },
+        { key: "deploys", label: "DEPLOYS", value: ticker.deploys },
     ];
+    const flowBlueprint = [
+        {
+            step: "01",
+            title: "Identity Handshake",
+            detail: "Resolve Farcaster handle and validate wallet session before module execution.",
+            status: isConnected ? "ready" : "wallet required",
+        },
+        {
+            step: "02",
+            title: "Signal Compilation",
+            detail: "Compile behavior vectors into X402 payload with confidence-weighted heuristics.",
+            status: loading ? "running" : "standby",
+        },
+        {
+            step: "03",
+            title: "Settlement Attempt",
+            detail: "Broadcast deploy capsule, return tx telemetry, and evaluate onchain final state.",
+            status: error ? "reverted" : "monitoring",
+        },
+    ] as const;
+
+    const outputSignals = [
+        {
+            label: "Module Profile",
+            value: result?.profile ?? "Awaiting deploy",
+            sub: "Narrative profile generated per operator handle.",
+        },
+        {
+            label: "Confidence Score",
+            value: result ? `${result.score}/100` : "Pending",
+            sub: "Composite score from behavior density and timing entropy.",
+        },
+        {
+            label: "Tx Status",
+            value: error ? "Insufficient balance" : loading ? "Broadcasting" : "Idle",
+            sub: "Deployment simulation keeps tx lifecycle visible in real time.",
+        },
+        {
+            label: "ERC-8004 Sync",
+            value: liveMode === "demo" ? "Synthetic live" : "Live feed",
+            sub: "Correlation layer aligns module output with settlement context.",
+        },
+    ] as const;
+    const workflowDetail = [
+        "1. User enters Farcaster handle and must connect wallet first.",
+        "2. X402 engine compiles behavior vectors into deploy payload.",
+        "3. System simulates gas estimate and transaction broadcast on Base.",
+        "4. Final state is intentionally reverted with insufficient balance.",
+        "5. UI returns status chips, live notice, and error context for retry.",
+    ] as const;
     const sparkPoints = TIMEFRAME_POINTS[timeframe];
     const filteredNoticeHistory = noticeHistory.filter((notice) =>
         noticeFilter === "all" ? true : notice.category === noticeFilter
@@ -1028,7 +1079,7 @@ export default function Home() {
                         </div>
 
                         <button
-                            onClick={handleRoast}
+                            onClick={handleDeploy}
                             disabled={loading || isConnecting}
                             className="w-full relative overflow-hidden group p-4 bg-primary hover:bg-secondary rounded-xl font-bold uppercase tracking-widest text-white transition-all duration-300 disabled:opacity-50 disabled:grayscale"
                         >
@@ -1080,7 +1131,7 @@ export default function Home() {
                                 </div>
                                 <h2 className="text-lg font-bold text-white mb-1">{result.profile}</h2>
                                 <p className="text-neutral-300 text-sm italic">
-                                    &ldquo;{result.roast}&rdquo;
+                                    &ldquo;{result.deploy}&rdquo;
                                 </p>
                             </motion.div>
                         )}
@@ -1154,9 +1205,9 @@ export default function Home() {
                                 }`}
                             >
                                 <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500">{item.label}</p>
-                                <div className="mt-1 flex items-center justify-between gap-2">
+                                <div className="mt-1 flex items-start gap-2">
                                     <p
-                                        className={`mt-1 text-sm font-semibold sm:text-base ${
+                                        className={`mt-1 min-w-0 flex-1 truncate text-sm font-semibold sm:text-base ${
                                             metricPulse[item.key] === "up"
                                                 ? "text-primary"
                                                 : metricPulse[item.key] === "down"
@@ -1167,7 +1218,7 @@ export default function Home() {
                                         <AnimatedMetricValue
                                             value={item.value}
                                             formatter={(current) => {
-                                                if (item.key === "users" || item.key === "roasts") {
+                                                if (item.key === "users" || item.key === "deploys") {
                                                     return NUMBER_INT.format(Math.round(current ?? 0));
                                                 }
                                                 if (item.key === "fdv") {
@@ -1178,7 +1229,7 @@ export default function Home() {
                                         />
                                     </p>
                                     <span
-                                        className={`rounded-full border px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest ${
+                                        className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-mono uppercase tracking-widest ${
                                             metricTrend[item.key] >= 0
                                                 ? "border-primary/45 bg-primary/12 text-primary"
                                                 : "border-orange-300/35 bg-orange-300/10 text-orange-200"
@@ -1219,50 +1270,109 @@ export default function Home() {
                             </div>
                         ))}
                     </div>
+                    <Marquee3D />
                 </div>
             </section>
 
             <section className="z-20 mt-10 w-full max-w-5xl">
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className={PANEL_SHELL_CLASS}>
-                        <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Deployment Flow</p>
-                        <h3 className="mt-2 text-2xl font-bold text-white">Three-Step Module Deployment</h3>
+                        <div className="flex items-center justify-between">
+                            <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Deployment Flow</p>
+                            <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
+                                Orchestrator
+                            </span>
+                        </div>
+                        <h3 className="mt-2 text-2xl font-bold text-white">Three-Phase Module Orchestration</h3>
+                        <p className="mt-2 text-sm text-neutral-300">
+                            The deploy path is sequenced to show identity gate, signal compilation, then settlement attempt.
+                        </p>
+
                         <div className="mt-4 space-y-3">
-                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
-                                <p className="text-xs font-mono uppercase tracking-widest text-primary">Step 1</p>
-                                <p className="mt-1 text-sm text-neutral-200">Input Farcaster handle and initialize deployment.</p>
+                            {flowBlueprint.map((item, index) => (
+                                <div key={item.step} className="relative rounded-xl border border-white/10 bg-white/3 px-4 py-3">
+                                    {index < flowBlueprint.length - 1 ? (
+                                        <div className="pointer-events-none absolute bottom-[-14px] left-[18px] top-[32px] w-px bg-linear-to-b from-primary/35 to-transparent" />
+                                    ) : null}
+                                    <div className="flex items-start gap-3">
+                                        <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-primary/35 bg-primary/12 text-[10px] font-mono text-primary">
+                                            {item.step}
+                                        </span>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <p className="text-sm font-semibold text-neutral-100">{item.title}</p>
+                                                <span className="rounded-full border border-white/15 bg-black/30 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest text-neutral-300">
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                            <p className="mt-1 text-xs text-neutral-300">{item.detail}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                            <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2">
+                                <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500">Wallet Gate</p>
+                                <p className="mt-1 text-xs font-semibold text-primary">{isConnected ? "Connected" : "Locked"}</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
-                                <p className="text-xs font-mono uppercase tracking-widest text-primary">Step 2</p>
-                                <p className="mt-1 text-sm text-neutral-200">Engine synthesizes behavior into a narrative profile and confidence score.</p>
+                            <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2">
+                                <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500">Pipeline</p>
+                                <p className="mt-1 text-xs font-semibold text-neutral-200">{loading ? "Executing" : "Idle"}</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
-                                <p className="text-xs font-mono uppercase tracking-widest text-primary">Step 3</p>
-                                <p className="mt-1 text-sm text-neutral-200">Output deploy capsule, module score, and ERC-8004 loop context.</p>
+                            <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2">
+                                <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500">Fallback</p>
+                                <p className="mt-1 text-xs font-semibold text-orange-200">Insufficient Balance</p>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 rounded-xl border border-white/10 bg-black/35 px-4 py-3">
+                            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">X402 to ERC-8004 Workflow</p>
+                            <div className="mt-2 space-y-1.5">
+                                {workflowDetail.map((item) => (
+                                    <p key={item} className="text-xs text-neutral-300">{item}</p>
+                                ))}
                             </div>
                         </div>
                     </div>
 
                     <div className={PANEL_SHELL_CLASS}>
-                        <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Deployment Output</p>
-                        <h3 className="mt-2 text-2xl font-bold text-white">Protocol Visibility Layer</h3>
+                        <div className="flex items-center justify-between">
+                            <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Deployment Output</p>
+                            <span className="rounded-full border border-white/15 bg-black/30 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-neutral-300">
+                                Visibility Layer
+                            </span>
+                        </div>
+                        <h3 className="mt-2 text-2xl font-bold text-white">Protocol Signal Surface</h3>
+                        <p className="mt-2 text-sm text-neutral-300">
+                            Every run emits profile context, confidence, tx state, and ERC-8004 alignment in one operator view.
+                        </p>
+
                         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
-                                <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Deploy Engine</p>
-                                <p className="mt-1 text-sm text-neutral-200">Real-time narrative module generation per handle.</p>
+                            {outputSignals.map((item) => (
+                                <div key={item.label} className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
+                                    <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">{item.label}</p>
+                                    <p className="mt-1 text-sm font-semibold text-primary">{item.value}</p>
+                                    <p className="mt-1 text-xs text-neutral-300">{item.sub}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-4 rounded-xl border border-primary/25 bg-primary/8 px-4 py-3">
+                            <div className="flex items-center justify-between gap-2">
+                                <p className="text-xs font-mono uppercase tracking-widest text-primary">Live Deploy Confidence</p>
+                                <p className="text-xs font-mono uppercase tracking-widest text-neutral-200">{result ? `${result.score}%` : "76%"}</p>
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
-                                <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Module Score</p>
-                                <p className="mt-1 text-sm text-neutral-200">Quantized deployment score from profile behavior vectors.</p>
+                            <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+                                <div
+                                    className="h-full rounded-full bg-linear-to-r from-primary to-secondary transition-all duration-700"
+                                    style={{ width: `${Math.max(24, Math.min(100, result?.score ?? 76))}%` }}
+                                />
                             </div>
-                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
-                                <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Live Metrics</p>
-                                <p className="mt-1 text-sm text-neutral-200">BTC, ETH, FDV, operator, and deployment activity snapshot.</p>
-                            </div>
-                            <div className="rounded-xl border border-white/10 bg-white/3 px-4 py-3">
-                                <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">ERC-8004 Sync</p>
-                                <p className="mt-1 text-sm text-neutral-200">Single-screen correlation flow with settlement-aware language.</p>
-                            </div>
+                            <p className="mt-2 text-xs text-neutral-300">
+                                Confidence bar updates from latest module score and keeps deployment readability at a glance.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1301,7 +1411,7 @@ export default function Home() {
                                         <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">{formatFeedTime(event.createdAt)}</p>
                                     </div>
                                     <p className="mt-1 text-xs font-mono uppercase tracking-widest text-primary">{event.profile} | score {event.score}</p>
-                                    <p className="mt-1 text-sm italic text-neutral-300 line-clamp-2">&ldquo;{event.roast}&rdquo;</p>
+                                    <p className="mt-1 text-sm italic text-neutral-300 line-clamp-2">&ldquo;{event.deploy}&rdquo;</p>
                                 </div>
                             ))}
                         </div>

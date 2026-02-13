@@ -13,16 +13,16 @@ model User {
   fid         Int?         @unique
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  roastEvents RoastEvent[]
+  deployEvents DeployEvent[]
 }
 
-model RoastEvent {
+model DeployEvent {
   id        String   @id @default(cuid())
   userId    String?
   username  String
   profile   String
   score     Int
-  roast     String
+  deploy     String
   source    String   @default("api")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

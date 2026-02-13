@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { LeaderboardEntry, RoastEvent } from "@/lib/roast-store";
+import type { LeaderboardEntry, DeployEvent } from "@/lib/deploy-store";
 
 type LeaderboardPeriod = "daily" | "weekly" | "all";
 
@@ -9,7 +9,7 @@ interface LeaderboardResponse {
     period: LeaderboardPeriod;
     minAttempts: number;
     leaderboard: LeaderboardEntry[];
-    recentRoasts: RoastEvent[];
+    recentDeploys: DeployEvent[];
 }
 
 const FALLBACK_LEADERBOARD: LeaderboardEntry[] = [
@@ -47,13 +47,13 @@ const FALLBACK_LEADERBOARD: LeaderboardEntry[] = [
     },
 ];
 
-const FALLBACK_RECENT_DEPLOYS: RoastEvent[] = [
+const FALLBACK_RECENT_DEPLOYS: DeployEvent[] = [
     {
         id: "fallback-deploy-1",
         username: "degenbella",
         profile: "Reply Guy",
         score: 94,
-        roast: "Deploy bundle broadcasted with high confidence and low latency drift.",
+        deploy: "Deploy bundle broadcasted with high confidence and low latency drift.",
         createdAt: new Date(Date.now() - 5 * 60_000).toISOString(),
     },
     {
@@ -61,7 +61,7 @@ const FALLBACK_RECENT_DEPLOYS: RoastEvent[] = [
         username: "basewizard",
         profile: "Larping Dev",
         score: 89,
-        roast: "Module compiled and finalized with stable gas profile.",
+        deploy: "Module compiled and finalized with stable gas profile.",
         createdAt: new Date(Date.now() - 11 * 60_000).toISOString(),
     },
     {
@@ -69,7 +69,7 @@ const FALLBACK_RECENT_DEPLOYS: RoastEvent[] = [
         username: "gmfarcaster",
         profile: "Vibes-only Trader",
         score: 91,
-        roast: "Operator synchronized deployment state across settlement nodes.",
+        deploy: "Operator synchronized deployment state across settlement nodes.",
         createdAt: new Date(Date.now() - 17 * 60_000).toISOString(),
     },
     {
@@ -77,7 +77,7 @@ const FALLBACK_RECENT_DEPLOYS: RoastEvent[] = [
         username: "alphaframe",
         profile: "Reply Guy",
         score: 86,
-        roast: "Runtime telemetry published with clean module score output.",
+        deploy: "Runtime telemetry published with clean module score output.",
         createdAt: new Date(Date.now() - 25 * 60_000).toISOString(),
     },
 ];
@@ -115,7 +115,7 @@ export default function LeaderboardPage() {
     }, [period, minAttempts]);
 
     const displayLeaderboard = data?.leaderboard.length ? data.leaderboard : FALLBACK_LEADERBOARD;
-    const displayRecentDeploys = data?.recentRoasts.length ? data.recentRoasts : FALLBACK_RECENT_DEPLOYS;
+    const displayRecentDeploys = data?.recentDeploys.length ? data.recentDeploys : FALLBACK_RECENT_DEPLOYS;
 
     return (
         <main className="relative min-h-screen overflow-hidden bg-black/55 px-6 pb-16 pt-28 sm:px-16 sm:pt-32">
@@ -208,7 +208,7 @@ export default function LeaderboardPage() {
                                             @{event.username} <span className="text-primary">({event.score})</span>
                                         </p>
                                         <p className="mt-1 text-neutral-400">{event.profile}</p>
-                                        <p className="mt-1 italic text-neutral-300">&ldquo;{event.roast}&rdquo;</p>
+                                        <p className="mt-1 italic text-neutral-300">&ldquo;{event.deploy}&rdquo;</p>
                                     </li>
                                 ))}
                             </ul>

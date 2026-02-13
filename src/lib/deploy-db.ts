@@ -1,39 +1,39 @@
-import type { RoastProfile } from "@/lib/roast-engine";
-import type { LeaderboardEntry, LeaderboardPeriod, RoastAggregateMetrics, RoastEvent } from "@/lib/roast-store";
+import type { DeployProfile } from "@/lib/deploy-engine";
+import type { LeaderboardEntry, LeaderboardPeriod, DeployAggregateMetrics, DeployEvent } from "@/lib/deploy-store";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
-const PROFILE_SET = new Set<RoastProfile>(["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"]);
+const PROFILE_SET = new Set<DeployProfile>(["Larping Dev", "Vibes-only Trader", "Reply Guy", "Unknown"]);
 
-export interface PersistRoastInput {
+export interface PersistDeployInput {
     username: string;
-    profile: RoastProfile;
+    profile: DeployProfile;
     score: number;
-    roast: string;
+    deploy: string;
     createdAt?: string;
     source?: string;
 }
 
-function toRoastProfile(value: string): RoastProfile {
-    if (PROFILE_SET.has(value as RoastProfile)) {
-        return value as RoastProfile;
+function toDeployProfile(value: string): DeployProfile {
+    if (PROFILE_SET.has(value as DeployProfile)) {
+        return value as DeployProfile;
     }
     return "Unknown";
 }
 
-function toRoastEvent(row: {
+function toDeployEvent(row: {
     id: string;
     username: string;
     profile: string;
     score: number;
-    roast: string;
+    deploy: string;
     createdAt: Date;
-}): RoastEvent {
+}): DeployEvent {
     return {
         id: row.id,
         username: row.username,
-        profile: toRoastProfile(row.profile),
+        profile: toDeployProfile(row.profile),
         score: row.score,
-        roast: row.roast,
+        deploy: row.deploy,
         createdAt: row.createdAt.toISOString(),
     };
 }
@@ -47,7 +47,7 @@ function periodStart(period: LeaderboardPeriod): Date | null {
     return new Date(now - windowMs);
 }
 
-export async function persistRoastEventToDb(input: PersistRoastInput): Promise<boolean> {
+export async function persistDeployEventToDb(input: PersistDeployInput): Promise<boolean> {
     if (!isDatabaseConfigured()) {
         return false;
     }
@@ -66,31 +66,31 @@ export async function persistRoastEventToDb(input: PersistRoastInput): Promise<b
             userId = user.id;
         }
 
-        await prisma.roastEvent.create({
+        await prisma.deployEvent.create({
             data: {
                 userId: userId ?? undefined,
                 username: normalizedUsername,
                 profile: input.profile,
                 score: input.score,
-                roast: input.roast,
+                deploy: input.deploy,
                 source: input.source ?? "api",
                 createdAt: input.createdAt ? new Date(input.createdAt) : undefined,
             },
         });
         return true;
     } catch (error) {
-        console.error("persistRoastEventToDb failed", error);
+        console.error("persistDeployEventToDb failed", error);
         return false;
     }
 }
 
-export async function getRecentRoastsFromDb(limit = 20): Promise<RoastEvent[] | null> {
+export async function getRecentDeploysFromDb(limit = 20): Promise<DeployEvent[] | null> {
     if (!isDatabaseConfigured()) {
         return null;
     }
     try {
         const safeLimit = Math.max(1, Math.min(limit, 100));
-        const rows = await prisma.roastEvent.findMany({
+        const rows = await prisma.deployEvent.findMany({
             orderBy: { createdAt: "desc" },
             take: safeLimit,
             select: {
@@ -98,13 +98,13 @@ export async function getRecentRoastsFromDb(limit = 20): Promise<RoastEvent[] | 
                 username: true,
                 profile: true,
                 score: true,
-                roast: true,
+                deploy: true,
                 createdAt: true,
             },
         });
-        return rows.map(toRoastEvent);
+        return rows.map(toDeployEvent);
     } catch (error) {
-        console.error("getRecentRoastsFromDb failed", error);
+        console.error("getRecentDeploysFromDb failed", error);
         return null;
     }
 }
@@ -119,7 +119,7 @@ export async function getLeaderboardFromDb(
     }
     try {
         const start = periodStart(period);
-        const rows = await prisma.roastEvent.findMany({
+        const rows = await prisma.deployEvent.findMany({
             where: start ? { createdAt: { gte: start } } : undefined,
             orderBy: { createdAt: "desc" },
             take: 4000,
@@ -156,7 +156,7 @@ export async function getLeaderboardFromDb(
                 attempts: events.length,
                 averageScore: Math.round((total / events.length) * 10) / 10,
                 bestScore,
-                lastProfile: toRoastProfile(latest.profile),
+                lastProfile: toDeployProfile(latest.profile),
                 lastAt: latest.createdAt.toISOString(),
             });
         }
@@ -170,13 +170,13 @@ export async function getLeaderboardFromDb(
     }
 }
 
-export async function getRoastAggregateFromDb(period: LeaderboardPeriod = "all"): Promise<RoastAggregateMetrics | null> {
+export async function getDeployAggregateFromDb(period: LeaderboardPeriod = "all"): Promise<DeployAggregateMetrics | null> {
     if (!isDatabaseConfigured()) {
         return null;
     }
     try {
         const start = periodStart(period);
-        const rows = await prisma.roastEvent.findMany({
+        const rows = await prisma.deployEvent.findMany({
             where: start ? { createdAt: { gte: start } } : undefined,
             take: 4000,
             select: {
@@ -186,7 +186,7 @@ export async function getRoastAggregateFromDb(period: LeaderboardPeriod = "all")
             },
         });
 
-        const profileBreakdown: Record<RoastProfile, number> = {
+        const profileBreakdown: Record<DeployProfile, number> = {
             "Larping Dev": 0,
             "Vibes-only Trader": 0,
             "Reply Guy": 0,
@@ -199,7 +199,7 @@ export async function getRoastAggregateFromDb(period: LeaderboardPeriod = "all")
 
         for (const row of rows) {
             users.add(row.username.toLowerCase());
-            const profile = toRoastProfile(row.profile);
+            const profile = toDeployProfile(row.profile);
             profileBreakdown[profile] += 1;
             scoreSum += row.score;
             if (row.score > bestScore) {
@@ -208,14 +208,14 @@ export async function getRoastAggregateFromDb(period: LeaderboardPeriod = "all")
         }
 
         return {
-            totalRoasts: rows.length,
+            totalDeploys: rows.length,
             uniqueUsers: users.size,
             averageScore: rows.length > 0 ? Math.round((scoreSum / rows.length) * 10) / 10 : 0,
             bestScore,
             profileBreakdown,
         };
     } catch (error) {
-        console.error("getRoastAggregateFromDb failed", error);
+        console.error("getDeployAggregateFromDb failed", error);
         return null;
     }
 }
