@@ -73,10 +73,10 @@ const FAKE_HANDLES = [
 ];
 
 const FAKE_PROFILES: RoastResult["profile"][] = [
-    "Signal Architect",
-    "Latency Hunter",
-    "Narrative Mapper",
-    "Unclassified",
+    "Larping Dev",
+    "Vibes-only Trader",
+    "Reply Guy",
+    "Unknown",
 ];
 
 const FAKE_ROAST_LINES = [
