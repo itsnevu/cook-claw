@@ -59,7 +59,7 @@ export function Footer() {
                     <div className="max-w-sm space-y-4">
                         <div className="flex items-center gap-3">
                             <Image
-                                src="/clawcook-logo.png"
+                                src="/CLAWCOOK-removebg.png"
                                 alt="ClawCook Logo"
                                 width={48}
                                 height={48}

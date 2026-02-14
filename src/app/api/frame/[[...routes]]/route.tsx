@@ -33,7 +33,7 @@ app.frame("/", (c) => {
                     padding: "0 80px",
                 }}
             >
-                <div style={{ color: "#FF4500", fontSize: 62, lineHeight: 1.2 }}>ClawCook</div>
+                <div style={{ color: "#d53016", fontSize: 62, lineHeight: 1.2 }}>ClawCook</div>
                 <div style={{ color: "white", fontSize: 28, marginTop: 12 }}>Deploy-to-Earn Clawbot</div>
                 <div style={{ color: "#B8B8B8", fontSize: 22, marginTop: 20 }}>
                     Enter Farcaster handle and pull the claw.
@@ -186,7 +186,7 @@ app.frame("/deploy", async (c) => {
                         padding: "0 80px",
                     }}
                 >
-                    <div style={{ color: "#FF4500", fontSize: 36 }}>
+                    <div style={{ color: "#d53016", fontSize: 36 }}>
                         @{username} / Score {result.score}
                     </div>
                     <div style={{ color: "#FFD3C2", fontSize: 24, marginTop: 10 }}>{result.profile}</div>

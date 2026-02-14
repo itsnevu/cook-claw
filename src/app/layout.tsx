@@ -51,7 +51,7 @@ export const metadata: Metadata = {
         description: "Deploy-ready narrative console for Farcaster handles with score output, live telemetry, and ERC-8004 aligned module context.",
         images: [
             {
-                url: "/clawcook-logo.png",
+                url: "/CLAWCOOK-removebg.png",
                 width: 1200,
                 height: 630,
                 alt: "ClawCook",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "ClawCook",
         description: "Deploy-ready narrative console for Farcaster handles with score output, live telemetry, and ERC-8004 aligned module context.",
-        images: ["/clawcook-logo.png"],
+        images: ["/CLAWCOOK-removebg.png"],
     },
     robots: {
         index: true,
@@ -76,9 +76,9 @@ export const metadata: Metadata = {
         },
     },
     icons: {
-        icon: "/clawcook-favicon.png",
-        shortcut: "/clawcook-favicon.png",
-        apple: "/clawcook-favicon.png",
+        icon: "/CLAWCOOK-removebg.png",
+        shortcut: "/CLAWCOOK-removebg.png",
+        apple: "/CLAWCOOK-removebg.png",
     },
 };
 

@@ -359,7 +359,7 @@ const MAX_CLICKS = 10;
 export default function PixelBlast({
     variant = "square",
     pixelSize = 3,
-    color = "#FB923C",
+    color = "#d53016",
     className,
     style,
     antialias = true,
@@ -722,4 +722,3 @@ export default function PixelBlast({
         />
     );
 }
-

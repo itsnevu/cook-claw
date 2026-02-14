@@ -14,37 +14,37 @@ const deployReviews: DeployReview[] = [
         name: "Nova Relay",
         username: "@novarelay",
         body: "Module capsule finalized in 7.2s. Gas path stable and settlement clean.",
-        img: "/clawcook.png",
+        img: "/CLAWCOOK-removebg.png",
     },
     {
         name: "Cast Matrix",
         username: "@castmatrix",
         body: "X402 sync locked. ERC-8004 loop confirmed with healthy confidence.",
-        img: "/clawcook.png",
+        img: "/CLAWCOOK-removebg.png",
     },
     {
         name: "Node Pilot",
         username: "@nodepilot",
         body: "Wallet gate passed, deploy attempt reached chain and returned expected state.",
-        img: "/clawcook.png",
+        img: "/CLAWCOOK-removebg.png",
     },
     {
         name: "Base Builder",
         username: "@basebuilder",
         body: "Operator profile mapped into narrative module with strong telemetry quality.",
-        img: "/clawcook.png",
+        img: "/CLAWCOOK-removebg.png",
     },
     {
         name: "Risk Oracle",
         username: "@riskoracle",
         body: "Synthetic live feed mirrors onchain pacing and keeps dashboard signal readable.",
-        img: "/clawcook.png",
+        img: "/CLAWCOOK-removebg.png",
     },
     {
         name: "Arc Relay",
         username: "@arcrelay",
         body: "Deployment stream looks real-time. Correlation events stay consistent.",
-        img: "/clawcook.png",
+        img: "/CLAWCOOK-removebg.png",
     },
 ];
 
@@ -58,7 +58,7 @@ function ReviewCard({ img, name, username, body }: DeployReview) {
         <figure
             className={cn(
                 "relative h-full w-fit cursor-pointer overflow-hidden rounded-xl border p-3 sm:w-44",
-                "border-primary/30 bg-black/55 hover:bg-black/65"
+                "border-primary/30 bg-[linear-gradient(180deg,rgba(30,12,10,0.72),rgba(40,12,18,0.68))] hover:bg-[linear-gradient(180deg,rgba(34,14,12,0.76),rgba(44,14,20,0.72))]"
             )}
         >
             <div className="flex flex-row items-center gap-2">

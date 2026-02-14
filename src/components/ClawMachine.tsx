@@ -11,8 +11,8 @@ const DROP_DURATION = 0.62;
 
 export function ClawMachine({ isGrabbing }: ClawMachineProps) {
     return (
-        <div className="relative mx-auto h-64 w-full max-w-[320px] overflow-hidden rounded-2xl border border-orange-300/25 bg-[radial-gradient(circle_at_20%_20%,rgba(251,146,60,0.22),transparent_45%),radial-gradient(circle_at_80%_15%,rgba(234,88,12,0.2),transparent_42%),linear-gradient(160deg,#0b0907,#1a120b_55%,#22170d)] sm:h-80 sm:max-w-[340px]">
-            <div className="pointer-events-none absolute inset-0 opacity-30 bg-size-[16px_16px] bg-[linear-gradient(to_right,rgba(251,146,60,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(251,146,60,0.14)_1px,transparent_1px)]" />
+        <div className="relative mx-auto h-64 w-full max-w-[320px] overflow-hidden rounded-2xl border border-orange-200/30 bg-[radial-gradient(circle_at_20%_20%,rgba(213,48,22,0.24),transparent_45%),radial-gradient(circle_at_80%_15%,rgba(179,9,40,0.2),transparent_42%),linear-gradient(160deg,#130a09,#1b0f0c_55%,#2a1016)] sm:h-80 sm:max-w-[340px]">
+            <div className="pointer-events-none absolute inset-0 opacity-30 bg-size-[16px_16px] bg-[linear-gradient(to_right,rgba(245,179,126,0.15)_1px,transparent_1px),linear-gradient(to_bottom,rgba(245,179,126,0.15)_1px,transparent_1px)]" />
             <div className="absolute left-1/2 top-2 h-2 w-44 -translate-x-1/2 rounded-full bg-orange-200/20" />
 
             <motion.div
@@ -21,7 +21,7 @@ export function ClawMachine({ isGrabbing }: ClawMachineProps) {
                 transition={isGrabbing ? { duration: 0.2 } : { duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
             >
                 <motion.div
-                    className="mx-auto w-0.5 bg-linear-to-b from-orange-300/80 via-orange-200/45 to-orange-100/20"
+                    className="mx-auto w-0.5 bg-linear-to-b from-orange-200/85 via-orange-200/50 to-rose-200/25"
                     animate={{ height: isGrabbing ? 166 : 52 }}
                     transition={{ duration: isGrabbing ? DROP_DURATION : 0.22, ease: isGrabbing ? "easeIn" : "easeOut" }}
                 />
@@ -56,10 +56,10 @@ export function ClawMachine({ isGrabbing }: ClawMachineProps) {
                         animate={isGrabbing ? { rotate: 0 } : { rotate: [0, -1.5, 1.5, 0] }}
                         transition={isGrabbing ? { duration: 0.2 } : { duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                     >
-                        <rect x="67" y="10" width="6" height="20" rx="3" fill="rgb(251 146 60)" />
-                        <circle cx="70" cy="36" r="8.5" fill="rgb(251 146 60)" stroke="rgba(251,146,60,0.45)" />
+                        <rect x="67" y="10" width="6" height="20" rx="3" fill="rgb(213 48 22)" />
+                        <circle cx="70" cy="36" r="8.5" fill="rgb(213 48 22)" stroke="rgba(213,48,22,0.45)" />
                         <circle cx="70" cy="36" r="3" fill="rgb(255 237 213)" />
-                        <rect x="58" y="42" width="24" height="5" rx="2.5" fill="rgb(251 146 60)" opacity="0.95" />
+                        <rect x="58" y="42" width="24" height="5" rx="2.5" fill="rgb(213 48 22)" opacity="0.95" />
                         <circle cx="58" cy="44.5" r="2.2" fill="rgb(255 237 213)" />
                         <circle cx="82" cy="44.5" r="2.2" fill="rgb(255 237 213)" />
 
@@ -69,9 +69,9 @@ export function ClawMachine({ isGrabbing }: ClawMachineProps) {
                                 animate={{ rotate: isGrabbing ? -46 : -4 }}
                                 transition={{ duration: isGrabbing ? DROP_DURATION : 0.22, ease: isGrabbing ? "easeIn" : "easeOut" }}
                             >
-                                <path d="M0 0 L-14 20 L-23 40" fill="none" stroke="rgb(251 146 60)" strokeWidth="6" strokeLinecap="round" />
-                                <path d="M-23 40 L-15 32" fill="none" stroke="rgb(251 146 60)" strokeWidth="4" strokeLinecap="round" />
-                                <path d="M-23 40 L-14 48" fill="none" stroke="rgb(251 146 60)" strokeWidth="4" strokeLinecap="round" />
+                                <path d="M0 0 L-14 20 L-23 40" fill="none" stroke="rgb(213 48 22)" strokeWidth="6" strokeLinecap="round" />
+                                <path d="M-23 40 L-15 32" fill="none" stroke="rgb(213 48 22)" strokeWidth="4" strokeLinecap="round" />
+                                <path d="M-23 40 L-14 48" fill="none" stroke="rgb(213 48 22)" strokeWidth="4" strokeLinecap="round" />
                             </motion.g>
                         </g>
 
@@ -81,13 +81,13 @@ export function ClawMachine({ isGrabbing }: ClawMachineProps) {
                                 animate={{ rotate: isGrabbing ? 46 : 4 }}
                                 transition={{ duration: isGrabbing ? DROP_DURATION : 0.22, ease: isGrabbing ? "easeIn" : "easeOut" }}
                             >
-                                <path d="M0 0 L14 20 L23 40" fill="none" stroke="rgb(251 146 60)" strokeWidth="6" strokeLinecap="round" />
-                                <path d="M23 40 L15 32" fill="none" stroke="rgb(251 146 60)" strokeWidth="4" strokeLinecap="round" />
-                                <path d="M23 40 L14 48" fill="none" stroke="rgb(251 146 60)" strokeWidth="4" strokeLinecap="round" />
+                                <path d="M0 0 L14 20 L23 40" fill="none" stroke="rgb(213 48 22)" strokeWidth="6" strokeLinecap="round" />
+                                <path d="M23 40 L15 32" fill="none" stroke="rgb(213 48 22)" strokeWidth="4" strokeLinecap="round" />
+                                <path d="M23 40 L14 48" fill="none" stroke="rgb(213 48 22)" strokeWidth="4" strokeLinecap="round" />
                             </motion.g>
                         </g>
 
-                        <circle cx="70" cy="44" r="4" fill="rgb(255 237 213)" stroke="rgba(251,146,60,0.65)" />
+                        <circle cx="70" cy="44" r="4" fill="rgb(255 237 213)" stroke="rgba(213,48,22,0.65)" />
                     </motion.svg>
                 </motion.div>
             </motion.div>

@@ -66,7 +66,7 @@ export function Navbar({ pageLabel }: { pageLabel?: string }) {
     return (
         <header className="fixed inset-x-0 top-0 z-40 py-3">
             <CardNav
-                logoSrc="/clawcook-logo.png"
+                logoSrc="/CLAWCOOK-removebg.png"
                 logoAlt="ClawCook Logo"
                 items={NAV_GROUPS}
                 baseColor="rgba(0, 0, 0, 0.86)"
