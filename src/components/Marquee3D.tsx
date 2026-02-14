@@ -58,7 +58,7 @@ function ReviewCard({ img, name, username, body }: DeployReview) {
         <figure
             className={cn(
                 "relative h-full w-fit cursor-pointer overflow-hidden rounded-xl border p-3 sm:w-44",
-                "border-primary/30 bg-[linear-gradient(180deg,rgba(30,12,10,0.72),rgba(40,12,18,0.68))] hover:bg-[linear-gradient(180deg,rgba(34,14,12,0.76),rgba(44,14,20,0.72))]"
+                "border-primary/30 bg-black/55 hover:bg-black/65"
             )}
         >
             <div className="flex flex-row items-center gap-2">

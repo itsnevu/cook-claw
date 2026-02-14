@@ -209,7 +209,7 @@ export function CardNav({
                         href="/"
                         className="order-1 flex items-center gap-3 text-white md:absolute md:left-1/2 md:top-1/2 md:order-none md:-translate-x-1/2 md:-translate-y-1/2"
                     >
-                        <Image src={logoSrc} alt={logoAlt} width={36} height={36} className="h-9 w-9 rounded-full object-cover" />
+                        <Image src={logoSrc} alt={logoAlt} width={132} height={36} className="h-9 w-auto object-contain" />
                         <div>
                             <p className="font-roxaine text-sm tracking-[0.1em]">ClawCook</p>
                             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">X402 x ERC-8004</p>

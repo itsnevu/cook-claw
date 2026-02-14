@@ -1058,7 +1058,7 @@ export default function Home() {
     const displayNoticeHistory = filteredNoticeHistory.length > 0 ? filteredNoticeHistory : fallbackNoticesRef.current;
 
     return (
-        <main className="relative min-h-screen flex flex-col items-center overflow-hidden bg-[linear-gradient(180deg,rgba(30,12,10,0.72),rgba(40,12,18,0.68))] px-4 pb-16 pt-28 sm:px-8 sm:pt-32 lg:px-16">
+        <main className="relative min-h-screen flex flex-col items-center overflow-hidden bg-black/55 px-4 pb-16 pt-28 sm:px-8 sm:pt-32 lg:px-16">
             <Script
                 id="x402-home-jsonld"
                 type="application/ld+json"
@@ -1098,7 +1098,7 @@ export default function Home() {
             <div id="deploy-console" className="z-20 flex w-full max-w-4xl flex-col items-stretch gap-10 md:flex-row md:items-center md:gap-16">
 
                 {/* The Claw Section */}
-                <div className="relative mx-auto w-full max-w-[340px] group">
+                <div className="relative mx-auto w-full max-w-85 group">
                     <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                     <div className="relative glass-panel rounded-2xl p-4 sm:p-8 md:p-10 hover:border-primary/30 transition-colors duration-500">
                         <ClawMachine isGrabbing={loading} />
@@ -1380,7 +1380,7 @@ export default function Home() {
                             {flowBlueprint.map((item, index) => (
                                 <div key={item.step} className="relative rounded-xl border border-white/10 bg-white/3 px-4 py-3">
                                     {index < flowBlueprint.length - 1 ? (
-                                        <div className="pointer-events-none absolute bottom-[-14px] left-[18px] top-[32px] w-px bg-linear-to-b from-primary/35 to-transparent" />
+                                        <div className="pointer-events-none absolute -bottom-3.5 left-4.5 top-8 w-px bg-linear-to-b from-primary/35 to-transparent" />
                                     ) : null}
                                     <div className="flex items-start gap-3">
                                         <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-primary/35 bg-primary/12 text-[10px] font-mono text-primary">

@@ -10,33 +10,33 @@
 
 @layer base {
     :root {
-        /* Warm orange-crimson dark theme variables (HSL) */
-        --background: 16 32% 8%;
+        /* Black base with claw red accents */
+        --background: 0 0% 5%;
         --foreground: 0 0% 95%;
 
-        /* Pastel orange for readable highlights */
-        --primary: 24 82% 72%;
+        /* #d53016 */
+        --primary: 8 81% 46%;
         --primary-foreground: 0 0% 100%;
 
-        /* Blend anchors requested by user: #d53016 and #b30928 */
-        --secondary: 8 81% 46%;
+        /* #b30928 */
+        --secondary: 350 90% 37%;
         --secondary-foreground: 0 0% 100%;
 
-        --accent: 350 89% 37%;
+        --accent: 350 90% 37%;
         --accent-foreground: 0 0% 90%;
 
-        --muted: 14 26% 18%;
+        --muted: 0 0% 15%;
         --muted-foreground: 0 0% 60%;
 
-        --card: 14 22% 10%;
+        --card: 0 0% 8%;
         --card-foreground: 0 0% 95%;
 
-        --border: 14 18% 22%;
-        --input: 14 18% 20%;
+        --border: 0 0% 15%;
+        --input: 0 0% 15%;
 
         /* Claw Specifics */
-        --claw-metallic: 14 14% 24%;
-        --claw-glow: 24 82% 72%;
+        --claw-metallic: 0 0% 20%;
+        --claw-glow: 8 81% 46%;
     }
 }
 
@@ -83,7 +83,7 @@
     }
 
     .glow-text {
-        text-shadow: 0 0 22px rgba(245, 179, 126, 0.55);
+        text-shadow: 0 0 20px rgba(213, 48, 22, 0.5);
     }
 
     .grid-bg {
@@ -141,7 +141,7 @@
     height: 8px;
     border-radius: 9999px;
     background: hsl(var(--primary));
-    box-shadow: 0 0 18px hsla(24, 82%, 72%, 0.88);
+    box-shadow: 0 0 18px hsla(8, 81%, 46%, 0.86);
     pointer-events: none;
     z-index: 120;
     transform: translate3d(-100px, -100px, 0);

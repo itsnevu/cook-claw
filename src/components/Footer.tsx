@@ -61,9 +61,9 @@ export function Footer() {
                             <Image
                                 src="/CLAWCOOK-removebg.png"
                                 alt="ClawCook Logo"
-                                width={48}
-                                height={48}
-                                className="h-12 w-12 rounded-full object-cover"
+                                width={180}
+                                height={56}
+                                className="h-12 w-auto object-contain"
                             />
                             <div>
                                 <div className="text-lg font-semibold text-white font-roxaine">ClawCook</div>
