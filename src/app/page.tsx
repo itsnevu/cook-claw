@@ -354,7 +354,7 @@ function AnimatedMetricValue({
 
 export default function Home() {
     const { address, isConnected } = useAccount();
-    const { connect, connectors, isPending: isConnecting } = useConnect();
+    const { connectAsync, connectors, isPending: isConnecting } = useConnect();
     const { disconnect } = useDisconnect();
     const [liveMode, setLiveMode] = useState<LiveMode>("mirror");
     const [timeframe, setTimeframe] = useState<SparkTimeframe>("15m");
@@ -901,13 +901,41 @@ export default function Home() {
         }
     };
 
+    const requestWalletConnection = async (): Promise<boolean> => {
+        const connector = connectors[0];
+        if (!connector) {
+            const message = "No wallet connector detected. Install MetaMask or open in a wallet browser.";
+            setError(message);
+            pushNotice("Wallet Unavailable", message, "warning", "tx");
+            return false;
+        }
+
+        try {
+            await connectAsync({ connector });
+            pushNotice("Wallet Connected", "Wallet handshake complete.", "success", "tx");
+            return true;
+        } catch (connectionError) {
+            const message = connectionError instanceof Error
+                ? connectionError.message
+                : "Wallet connection request was not completed.";
+            setError(`Wallet connection failed: ${message}`);
+            pushNotice("Wallet Connection Failed", "Approve wallet connection to continue.", "warning", "tx");
+            return false;
+        }
+    };
+
     const handleDeploy = async () => {
-        const normalizedUsername = username.trim().replace(/^@/, "");
-        if (!normalizedUsername) return;
         if (!isConnected) {
             setDeploySteps([]);
-            setError("Connect wallet first before deploying module.");
-            pushNotice("Wallet Required", "Connect your wallet first to continue deployment.", "warning", "tx");
+            const connected = await requestWalletConnection();
+            if (!connected) {
+                return;
+            }
+        }
+
+        const normalizedUsername = username.trim().replace(/^@/, "");
+        if (!normalizedUsername) {
+            setError("Enter Farcaster handle first before deploying.");
             return;
         }
         void captureClientEvent("deploy_initiated", {
@@ -1142,8 +1170,7 @@ export default function Home() {
                                         type="button"
                                         disabled={isConnecting || connectors.length === 0}
                                         onClick={() => {
-                                            const connector = connectors[0];
-                                            if (connector) connect({ connector });
+                                            void requestWalletConnection();
                                         }}
                                         className="rounded-lg border border-primary/35 bg-primary/12 px-3 py-2 text-[10px] font-mono uppercase tracking-widest text-primary transition-colors hover:bg-primary/20 disabled:opacity-60"
                                     >
