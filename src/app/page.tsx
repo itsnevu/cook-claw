@@ -970,7 +970,7 @@ export default function Home() {
     const displayNoticeHistory = filteredNoticeHistory.length > 0 ? filteredNoticeHistory : fallbackNoticesRef.current;
 
     return (
-        <main className="relative min-h-screen flex flex-col items-center p-6 pb-16 pt-28 sm:px-16 sm:pt-32 overflow-hidden bg-black/55">
+        <main className="relative min-h-screen flex flex-col items-center overflow-hidden bg-black/55 px-4 pb-16 pt-28 sm:px-8 sm:pt-32 lg:px-16">
             <Script
                 id="x402-home-jsonld"
                 type="application/ld+json"
@@ -991,7 +991,7 @@ export default function Home() {
                 <p className="mx-auto mt-5 max-w-2xl text-sm text-neutral-300 sm:text-base">
                     Input a handle, trigger the X402 operator, and deploy a synthetic narrative module aligned with ERC-8004 output. One flow for identity context, score, and settlement-ready telemetry.
                 </p>
-                <div className="mt-7 flex items-center justify-center gap-3">
+                <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
                     <a
                         href="#deploy-console"
                         className="rounded-xl bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-secondary"
@@ -1007,18 +1007,18 @@ export default function Home() {
                 </div>
             </section>
 
-            <div id="deploy-console" className="z-20 w-full max-w-4xl flex flex-col md:flex-row items-center gap-12 sm:gap-24">
+            <div id="deploy-console" className="z-20 flex w-full max-w-4xl flex-col items-stretch gap-10 md:flex-row md:items-center md:gap-16">
 
                 {/* The Claw Section */}
-                <div className="relative group">
+                <div className="relative mx-auto w-full max-w-[340px] group">
                     <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                    <div className="relative glass-panel rounded-2xl p-8 sm:p-12 hover:border-primary/30 transition-colors duration-500">
+                    <div className="relative glass-panel rounded-2xl p-4 sm:p-8 md:p-10 hover:border-primary/30 transition-colors duration-500">
                         <ClawMachine isGrabbing={loading} />
                     </div>
                 </div>
 
                 {/* Controls Section */}
-                <div className="flex-1 w-full max-w-sm flex flex-col gap-6">
+                <div className="flex w-full max-w-sm flex-1 flex-col gap-6 self-center md:self-auto">
                     <div className="text-center md:text-left space-y-2">
                         <h2 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white glow-text font-roxaine">
                             X402<span className="text-secondary">.CORE</span>
@@ -1031,7 +1031,7 @@ export default function Home() {
                     <div className="space-y-4">
                         <div className="rounded-xl border border-white/10 bg-black/35 p-3">
                             {isConnected && address ? (
-                                <div className="flex items-center justify-between gap-2">
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Wallet Connected</p>
                                         <p className="mt-1 text-sm font-mono text-neutral-200">{shortAddress(address)}</p>
@@ -1045,7 +1045,7 @@ export default function Home() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="flex items-center justify-between gap-2">
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Wallet Required</p>
                                         <p className="mt-1 text-sm text-neutral-300">Connect wallet to unlock deployment flow.</p>
@@ -1071,7 +1071,7 @@ export default function Home() {
                                 placeholder="@farcaster_handle"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full p-4 glass-input rounded-xl text-center md:text-left font-mono text-lg outline-none"
+                                className="w-full rounded-xl p-4 text-center font-mono text-base outline-none glass-input md:text-left sm:text-lg"
                             />
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600 text-xs font-mono">
                                 FC_V2
@@ -1157,7 +1157,7 @@ export default function Home() {
                     <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
                     <div className="pointer-events-none absolute -bottom-28 -left-24 h-56 w-56 rounded-full bg-secondary/15 blur-3xl" />
 
-                    <div className="relative mb-4 flex items-center justify-between">
+                    <div className="relative mb-4 flex flex-wrap items-center justify-between gap-2">
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-neutral-400">Deployment Pulse</p>
                         <div className="flex items-center gap-2">
                             <button
@@ -1175,7 +1175,7 @@ export default function Home() {
                     <p className="relative -mt-2 mb-4 text-[10px] font-mono uppercase tracking-widest text-neutral-500">
                         Last sync {formatFeedTime(lastSyncAt)}
                     </p>
-                    <div className="relative mb-4 flex items-center gap-2">
+                    <div className="relative mb-4 flex flex-wrap items-center gap-2">
                         {(["1m", "5m", "15m", "1h"] as SparkTimeframe[]).map((tf) => (
                             <button
                                 key={tf}
@@ -1277,7 +1277,7 @@ export default function Home() {
             <section className="z-20 mt-10 w-full max-w-5xl">
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className={PANEL_SHELL_CLASS}>
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                             <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Deployment Flow</p>
                             <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
                                 Orchestrator
@@ -1338,7 +1338,7 @@ export default function Home() {
                     </div>
 
                     <div className={PANEL_SHELL_CLASS}>
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                             <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Deployment Output</p>
                             <span className="rounded-full border border-white/15 bg-black/30 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-neutral-300">
                                 Visibility Layer
@@ -1421,7 +1421,7 @@ export default function Home() {
 
             <section className="z-20 mt-4 w-full max-w-5xl">
                 <div className={PANEL_SHELL_CLASS}>
-                    <div className="mb-4 flex items-center justify-between">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Live Tx Stream</p>
                         <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500">
                             {liveMode === "real" ? "X402 Settlement Stream" : "ERC-8004 Mirror Feed"}
@@ -1429,20 +1429,19 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                         {displayTxStream.map((tx) => (
-                            <div
-                                key={tx.id}
-                                className="grid grid-cols-[1.3fr_1fr_auto] items-center gap-3 rounded-xl border border-white/10 bg-white/3 px-3 py-2.5 sm:grid-cols-[1.2fr_1fr_0.8fr_0.8fr_auto] sm:px-4"
-                            >
-                                <div>
+                            <div key={tx.id} className="rounded-xl border border-white/10 bg-white/3 px-3 py-2.5 sm:px-4">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
                                     <p className="text-xs font-mono uppercase tracking-widest text-neutral-400">{tx.hash}</p>
-                                    <p className="mt-1 text-sm text-neutral-200">{tx.action}</p>
+                                    <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
+                                        {tx.status}
+                                    </span>
                                 </div>
-                                <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Block {tx.block}</p>
-                                <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">{tx.gasGwei} gwei</p>
-                                <p className="text-xs font-mono uppercase tracking-widest text-primary">${tx.valueUsd.toLocaleString("en-US")}</p>
-                                <span className="justify-self-end rounded-full border border-primary/30 bg-primary/10 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-primary">
-                                    {tx.status}
-                                </span>
+                                <p className="mt-1 text-sm text-neutral-200">{tx.action}</p>
+                                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                                    <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">Block {tx.block}</p>
+                                    <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">{tx.gasGwei} gwei</p>
+                                    <p className="text-xs font-mono uppercase tracking-widest text-primary">${tx.valueUsd.toLocaleString("en-US")}</p>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -1451,9 +1450,9 @@ export default function Home() {
 
             <section className="z-20 mt-4 w-full max-w-5xl">
                 <div className={PANEL_SHELL_CLASS}>
-                    <div className="mb-4 flex items-center justify-between">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                         <p className="text-xs font-mono uppercase tracking-[0.18em] text-primary">Notification Center</p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             {(["all", "market", "leaderboard", "tx"] as Array<NoticeCategory | "all">).map((item) => (
                                 <button
                                     key={item}
@@ -1486,7 +1485,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <div className="pointer-events-none fixed right-4 top-24 z-70 flex w-[min(92vw,24rem)] flex-col gap-2 sm:right-6 sm:top-28">
+            <div className="pointer-events-none fixed right-4 top-24 z-70 hidden w-[min(92vw,24rem)] flex-col gap-2 sm:right-6 sm:top-28 md:flex">
                 <AnimatePresence initial={false}>
                     {liveNotices.map((notice) => (
                         <motion.div

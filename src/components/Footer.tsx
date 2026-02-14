@@ -52,7 +52,7 @@ function FooterLink({ href, label, external }: { href: string; label: string; ex
 
 export function Footer() {
     return (
-        <footer className="relative mt-20 border-t border-white/10 bg-black/60 px-6 py-12 sm:px-12">
+        <footer className="relative mt-20 bg-black/60 px-6 py-12 sm:px-12">
             <div className="absolute inset-0 opacity-30 grid-bg pointer-events-none" />
             <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-10">
                 <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
